@@ -3,7 +3,7 @@ from forms import LoginForm, RegisterForm
 
 from config import app, db
 from helpers import login_required, toHash, hasNumber, hasSpecial, userId
-from models import User, Activities, MonthGoals
+from models import User, Activity, MonthGoal
 
 @app.route("/", methods=["GET"])
 def home():
@@ -60,7 +60,7 @@ def log_in():
     
     if user.password == password:
         session["id"] = user.uuid
-        return redirect(url_for('main'))
+        return redirect(url_for('home'))
 
     return f"""Password doesnt match"""
 
@@ -87,7 +87,7 @@ def schedule_goals():
         user_uuid = userId()
 
         for day,activity in schedule:
-            new_activity = Activities(
+            new_activity = Activity(
                 user_uuid=user_uuid,
                 activity_details=activity["details"],
                 start_time=activity["start_time"],
@@ -97,7 +97,7 @@ def schedule_goals():
             db.session.add(new_activity)
 
         for goal in goals:
-            new_goal = MonthGoals(
+            new_goal = MonthGoal(
                 user_uuid=user_uuid,
                 goal_details=goal["details"],
                 hour_goal=goal.get("hour_goal"),

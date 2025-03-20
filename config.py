@@ -7,7 +7,11 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
+from models import *
+
 with app.app_context():
     db.create_all()
 
+ollama_endpoint = "http://localhost:11434"
 ollama_model = "deepseek-r1:14b"
