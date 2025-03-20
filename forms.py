@@ -6,3 +6,10 @@ class LoginForm(FlaskForm):
     username=StringField('Username',validators=[DataRequired(),Length(3,20)])
     password=PasswordField('Password',validators=[DataRequired()])
     submit=SubmitField('Log in')
+
+class RegisterForm(FlaskForm):
+    username=StringField('Username',validators=[DataRequired(),Length(3,20)])
+    password=PasswordField('Password',validators=[DataRequired()])
+    confirm_password=PasswordField('Password',validators=[DataRequired()])
+    submit=SubmitField('Register')
+    

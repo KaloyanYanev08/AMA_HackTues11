@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, session, url_for, jsonify
-from forms import LoginForm
+from forms import LoginForm, RegisterForm
 from uuid import uuid4 as genuuid
 
 from config import app, db, ollama_model
@@ -12,12 +12,14 @@ def home():
 
 @app.route("/register/", methods=["GET", "POST"])
 def register():
+    form=RegisterForm()
     if not request.method == "POST":
-        return render_template("register.html", page="Register")
-
+        return render_template("register.html", page="Register",form=form)
+    
     try:
-        username = request.form.get('username')
-        password = request.form.get('password')
+        username = form.username.data
+        password = form.password.data
+        confirm_password=form.password.data
     except:
         return f"""Fields not filled"""
     
@@ -25,6 +27,7 @@ def register():
         return f"""Pasword be at least 8 characters and have at least one number and special character"""
     
     password = toHash(password)
+    confirm_password=toHash(confirm_password)
 
     if User.query.filter_by(username=username).first() is not None:
         return f"""User exists"""
