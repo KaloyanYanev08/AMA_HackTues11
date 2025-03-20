@@ -10,5 +10,4 @@ db = SQLAlchemy(app)
 with app.app_context():
     db.create_all()
 
-ollama_endpoint = "http://localhost:11434"
 ollama_model = "deepseek-r1:14b"

@@ -1,16 +1,18 @@
 from flask import jsonify
-import requests
-from config import ollama_endpoint
+from ollama import Client
 
-api_path = "/api/generate"
+from config import ollama_model, ollama_endpoint
 
-def send_to_model(prompt, model):
+def send_to_model(prompt):
     try:
-        response = requests.post(
-            ollama_endpoint + api_path,
-            json={"prompt": prompt, "model": model, "stream": False, "format": "json"}
+        client = Client(
+            host=ollama_endpoint
         )
-        response.raise_for_status()
-        return jsonify(response.json())
-    except requests.RequestException as e:
+        response = client.chat(
+            model=ollama_model,
+            messages=[{'role': 'user', 'content': prompt}],
+            stream=False
+        )
+        return jsonify(response)
+    except Exception as e:
         return jsonify({"error": str(e)}), 500

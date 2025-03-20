@@ -1,8 +1,7 @@
 from flask import render_template, request, redirect, session, url_for, jsonify
 from forms import LoginForm, RegisterForm
-from uuid import uuid4 as genuuid
 
-from config import app, db, ollama_model
+from config import app, db
 from helpers import login_required, toHash, hasNumber, hasSpecial, userId
 from models import User, Activities, MonthGoals
 
@@ -16,6 +15,8 @@ def register():
     if not request.method == "POST":
         return render_template("register.html", page="Register",form=form)
     
+    from uuid import uuid4 as genuuid
+
     try:
         username = form.username.data
         password = form.password.data
@@ -142,4 +143,4 @@ def process_data():
     Return the information in a JSON format, a computer will process it so don't format it for human viewing: an object with every day of the week as a number, the values being lists. The lists contain objects with keys start_time, end_time and details for each activity.
     """
 
-    return send_to_model(prompt, ollama_model)
+    return send_to_model(prompt)
