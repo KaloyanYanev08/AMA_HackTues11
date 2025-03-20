@@ -118,6 +118,10 @@ def schedule_goals():
 def create_schedule():
     form = ScheduleGoalsForm()
 
+    if form.add_more.data and request.method == "POST":  # Handle adding more activities
+        form.activities.append_entry()
+        return render_template("schedule.html", page="Schedule", form=form)
+
     if form.validate_on_submit():  # Handle form submission
         user_uuid = userId()
         try:
@@ -132,12 +136,14 @@ def create_schedule():
                 )
                 db.session.add(new_activity)
             db.session.commit()
-            return redirect(url_for('home'))
+            return redirect(url_for('home'))  # Redirect to home after saving
         except Exception as e:
             db.session.rollback()
+            # Debugging: Log the error
             print(f"Error saving activities: {str(e)}")
             return f"An error occurred: {str(e)}", 500
 
+    # Debugging: Log form errors if validation fails
     if form.errors:
         print(f"Form errors: {form.errors}")
 
