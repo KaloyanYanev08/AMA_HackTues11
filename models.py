@@ -14,6 +14,7 @@ class Activity(db.Model):
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
     day_of_week = db.Column(db.String, nullable=False)
+    date=db.Column(db.Date, nullable=False)
 
 class MonthGoal(db.Model):
     __tablename__ = 'month_goals'
@@ -22,3 +23,4 @@ class MonthGoal(db.Model):
     goal_details = db.Column(db.String, nullable=False)
     hour_goal = db.Column(db.Integer, nullable=True)
     month = db.Column(db.String, nullable=False)
+    year=db.Column(db.Integer, nullable=False)
