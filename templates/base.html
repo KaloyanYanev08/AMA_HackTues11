@@ -9,13 +9,14 @@
         <link href="https://cdn.jsdelivr.net/npm/daisyui@5/themes.css" rel="stylesheet" type="text/css" />
     </head>
     <body>
-        <div class="navbar bg-base-100 shadow-sm fixed top z-50">
-            <div class="flex-none z-50">
-                <label class="btn btn-square btn-ghost z-50">
+        <div class="navbar bg-base-100 shadow-sm fixed top z-50 flex justify-between items-center" style="z-index: 50; position: fixed; width: calc(100% - 17px);">
+            <div class="flex-none">
+                <label class="btn btn-square btn-ghost">
                     <img src="/static/RADO.svg" alt="Logo" class="h-8">
                 </label>
             </div>
             <div class="flex-1">
+                <!-- Add any additional content here if needed -->
             </div>
             <div class="flex-none">
                 <label for="my-drawer" class="btn btn-square btn-ghost drawer-button">
@@ -25,20 +26,43 @@
                 </label>
             </div>
         </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const navbar = document.querySelector('.navbar');
+                const drawerToggle = document.querySelector('#my-drawer');
+
+                const adjustNavbarWidth = () => {
+                    if (drawerToggle.checked) {
+                        navbar.style.width = 'calc(100% - 17px)';
+                    } else {
+                        navbar.style.width = 'calc(100%)';
+                    }
+                };
+
+                window.addEventListener('resize', adjustNavbarWidth);
+                window.addEventListener('scroll', adjustNavbarWidth);
+                drawerToggle.addEventListener('change', adjustNavbarWidth);
+
+                adjustNavbarWidth();
+            });
+        </script>
+
         <div class="drawer">
             <input id="my-drawer" type="checkbox" class="drawer-toggle" />
             <div class="drawer-side z-40">
                 <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-                <ul class="menu bg-base-200 text-base-content min-h-full w-80 p-4 pt-20 sm:w-64 md:w-48 lg:w-40">
+                <ul class="menu bg-base-200 text-base-content min-h-full p-4 pt-20" style="width: 25vw; max-width: 300px; min-width: 200px;">
                     <li><a>Sidebar Item 1</a></li>
                     <li><a>Sidebar Item 2</a></li>
                 </ul>
             </div>
             <div class="drawer-content min-h-screen flex flex-col">
                 <div class="flex-grow">
-                    <div class="pt-20">
-                        {% block content %}
-                        {% endblock %}
+                    <div class="pt-16">
+                        <!--{% block content %}-->
+                        
+                        <!--{% endblock %}-->
                     </div>
                 </div>
                 <footer class="footer sm:footer-horizontal bg-neutral text-neutral-content p-10 mt-auto z-10">
