@@ -5,6 +5,7 @@ from uuid import uuid4 as genuuid
 import re as regex
 import hashlib
 import requests
+from forms import LoginForm
 
 app = Flask(__name__)
 app.secret_key = "TESTING_TESTING_123"
@@ -116,14 +117,15 @@ def register():
 
     return redirect(url_for('log_in'))
 
-@app.route("/log-in/", methods=["GET", "POST"])
-def log_in():
+@app.route("/login/", methods=['GET', 'POST'])
+def login():
+    form=LoginForm()
     if not request.method == "POST":
-        return render_template("login.html", page="Log in")
+        return render_template("login.html", page="Log in",form=form)
 
     try:
-        username = request.form.get('username')
-        password = toHash(request.form.get('password'))
+        username = form.username.data
+        password = toHash(form)
     except:
         return f"""Fields not filled"""
     
@@ -212,9 +214,7 @@ def process_data():
 
     return jsonify(ai_result)
 
-@app.route("/login/", methods=['GET', 'POST'])
-def login():
-    return render_template("login.html", page="login")
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, threaded=True, debug=True)

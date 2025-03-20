@@ -3,26 +3,43 @@
 {% block content %}
 <div class="min-h-sm flex items-center justify-center">
     <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100 mt-15">
-        <form class="card-body" method="POST">
+        <form method="POST" class="card-body">
+            {{ form.hidden_tag() }}
             <span class="text-2xl font-bold text-center">Login</span>
-            <div class="form-control">
-                <label class="label">
-                    <span class="label-text">Email</span>
-                </label>
-                <input type="email" name="email" placeholder="email" class="input input-bordered" required />
-            </div>
-            <div class="form-control">
-                <label class="label">
-                    <span class="label-text">Password</span>
-                </label>
-                <input type="password" name="password" placeholder="password" class="input input-bordered" required />
-                <label class="label">
-                    <a href="{{ url_for('register') }}" class="label-text-alt link link-hover">Don't have an account?</a>
-                </label>
-            </div>
+            <fieldset class="form-group">
+                <div class="form-control">
+                    {{ form.username.label(class="label-text") }}
+                    {% if form.username.errors %}
+                        {{ form.username(class="input input-bordered is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.username.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.username(class="input input-bordered") }}
+                    {% endif %}
+                </div>
+                <div class="form-control">
+                    {{ form.password.label(class="label-text") }}
+                    {% if form.password.errors %}
+                        {{ form.password(class="input input-bordered is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.password(class="input input-bordered") }}
+                    {% endif %}
+                </div>
+            </fieldset>
             <div class="form-control mt-6">
-                <button class="btn btn-primary">Login</button>
+                {{ form.submit(class="btn btn-primary") }}
             </div>
+            <label class="label">
+                <a href="{{ url_for('register') }}" class="label-text-alt link link-hover">Don't have an account?</a>
+            </label>
         </form>
     </div>
 </div>
