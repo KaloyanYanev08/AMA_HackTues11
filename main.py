@@ -212,5 +212,9 @@ def process_data():
 
     return jsonify(ai_result)
 
+@app.route("/login/", methods=['GET', 'POST'])
+def login():
+    return render_template("login.html", page="login")
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, threaded=True, debug=True)
