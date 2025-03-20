@@ -20,7 +20,7 @@ def register():
     try:
         username = form.username.data
         password = form.password.data
-        confirm_password=form.password.data
+        confirm_password = form.confirm_password.data  # Corrected to fetch confirm_password from the form
     except:
         return f"""Fields not filled"""
     
@@ -29,6 +29,9 @@ def register():
     
     password = toHash(password)
     confirm_password=toHash(confirm_password)
+
+    if password != confirm_password:
+        return f"""Passwords do not match"""
 
     if User.query.filter_by(username=username).first() is not None:
         return f"""User exists"""
