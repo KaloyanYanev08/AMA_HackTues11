@@ -6,7 +6,7 @@ class User(db.Model):
     username = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
 
-class Activities(db.Model):
+class Activity(db.Model):
     __tablename__ = 'activities'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_uuid = db.Column(db.String, db.ForeignKey('users.uuid'), nullable=False)
@@ -15,7 +15,7 @@ class Activities(db.Model):
     end_time = db.Column(db.Time, nullable=False)
     day_of_week = db.Column(db.String, nullable=False)
 
-class MonthGoals(db.Model):
+class MonthGoal(db.Model):
     __tablename__ = 'month_goals'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_uuid = db.Column(db.String, db.ForeignKey('users.uuid'), nullable=False)
