@@ -33,11 +33,18 @@
                 const navbar = document.querySelector('.navbar');
                 const drawerToggle = document.querySelector('#my-drawer');
 
+                const isDesktop = () => window.matchMedia('(min-width: 768px)').matches;
+
                 const adjustNavbarWidth = () => {
+                    if (!isDesktop()) {
+                        navbar.style.width = '100%';
+                        return;
+                    }
+
                     if (drawerToggle.checked) {
                         navbar.style.width = 'calc(100% - 17px)';
                     } else {
-                        navbar.style.width = 'calc(100%)';
+                        navbar.style.width = '100%';
                     }
                 };
 
