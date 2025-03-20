@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 flex flex-col items-center py-10">
+    <div class="m-[5%] size-5/8 flex flex-col lg:flex-row lg:justify-around gap-8">
+        <div class="w-full lg:w-2/3 p-6 bg-white shadow-xl rounded-2xl">
+            <h2 class="text-4xl font-bold mb-6 text-center">Time Spent on Activities</h2>
+            <canvas id="pieChart" class="rounded-lg"></canvas>
+        </div>
+        <div class="w-full lg:w-2/3 p-6 bg-white shadow-xl rounded-2xl">
+            <h2 class="text-4xl font-bold mb-6 text-center">Goal Progress</h2>
+            <div class="mb-6">
+                <label class="block text-lg font-semibold text-gray-700">Goal 1</label>
+                <div class="w-full bg-gray-200 rounded-full h-6">
+                    <div class="bg-red-600 text-sm font-medium text-red-100 text-center p-1 leading-none rounded-full" style="width: 70%">70%</div>
+                </div>
+            </div>
+            <div class="mb-6">
+                <label class="block text-lg font-semibold text-gray-700">Goal 2</label>
+                <div class="w-full bg-gray-200 rounded-full h-6">
+                    <div class="bg-yellow-600 text-sm font-medium text-yellow-100 text-center p-1 leading-none rounded-full" style="width: 50%">50%</div>
+                </div>
+            </div>
+            <div class="mb-6">
+                <label class="block text-lg font-semibold text-gray-700">Goal 3</label>
+                <div class="w-full bg-gray-200 rounded-full h-6">
+                    <div class="bg-green-600 text-sm font-medium text-green-100 text-center p-1 leading-none rounded-full" style="width: 30%">30%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('pieChart').getContext('2d');
+    const pieChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Activity 1', 'Activity 2', 'Activity 3'],
+            datasets: [{
+                data: [10, 20, 30],
+                backgroundColor: ['#DC2626', '#FBBF24', '#10B981'],
+            }]
+        },
+        options: {
+            responsive: true,
+        }
+    });
+</script>
+{% endblock %}
