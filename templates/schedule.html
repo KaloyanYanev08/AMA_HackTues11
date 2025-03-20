@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="flex items-center justify-center">
+    <div class="card flex-shrink-0 w-full max-w-lg shadow-2xl bg-base-100 mt-15">
+        <form method="POST" action="" class="card-body">
+            {{ form.hidden_tag() }}
+            <span class="text-2xl font-bold text-center">Create Schedule</span>
+            <fieldset class="form-group">
+                {% for activity in form.activities %}
+                <div class="form-control">
+                    {{ activity.details.label(class="label-text") }}
+                    {% if activity.details.errors %}
+                        {{ activity.details(class="input input-bordered is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in activity.details.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ activity.details(class="input input-bordered") }}
+                    {% endif %}
+                </div>
+                <div class="form-control">
+                    {{ activity.start_time.label(class="label-text") }}
+                    {% if activity.start_time.errors %}
+                        {{ activity.start_time(class="input input-bordered is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in activity.start_time.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ activity.start_time(class="input input-bordered") }}
+                    {% endif %}
+                </div>
+                <div class="form-control">
+                    {{ activity.end_time.label(class="label-text") }}
+                    {% if activity.end_time.errors %}
+                        {{ activity.end_time(class="input input-bordered is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in activity.end_time.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ activity.end_time(class="input input-bordered") }}
+                    {% endif %}
+                </div>
+                <div class="form-control">
+                    {{ activity.day_of_week.label(class="label-text") }}
+                    {% if activity.day_of_week.errors %}
+                        {{ activity.day_of_week(class="select select-bordered is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in activity.day_of_week.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ activity.day_of_week(class="select select-bordered") }}
+                    {% endif %}
+                </div>
+                <hr class="my-4">
+                {% endfor %}
+            </fieldset>
+            <div class="form-control mt-6">
+                {{ form.add_more(class="btn btn-secondary") }}
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

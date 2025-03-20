@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, session, url_for, jsonify
-from forms import LoginForm, RegisterForm
-
+from forms import LoginForm, RegisterForm, ActivityForm, ScheduleGoalsForm
+from datetime import datetime
 from config import app, db
 from helpers import login_required, toHash, hasNumber, hasSpecial, userId
 from models import User, Activity, MonthGoal
@@ -112,6 +112,36 @@ def schedule_goals():
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+
+@app.route("/create_schedule/", methods=["GET", "POST"])
+@login_required
+def create_schedule():
+    form = ScheduleGoalsForm()
+
+    if form.validate_on_submit():  # Handle form submission
+        user_uuid = userId()
+        try:
+            for activity in form.activities.data:
+                new_activity = Activity(
+                    user_uuid=user_uuid,
+                    activity_details=activity["details"],
+                    start_time=activity["start_time"],
+                    end_time=activity["end_time"],
+                    day_of_week=activity["day_of_week"],
+                    date=activity["date"]
+                )
+                db.session.add(new_activity)
+            db.session.commit()
+            return redirect(url_for('home'))
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error saving activities: {str(e)}")
+            return f"An error occurred: {str(e)}", 500
+
+    if form.errors:
+        print(f"Form errors: {form.errors}")
+
+    return render_template("schedule.html", page="Schedule", form=form)
 
 @app.route("/process-data/", methods=["POST"])
 @login_required
