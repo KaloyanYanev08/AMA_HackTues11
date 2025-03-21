@@ -106,7 +106,7 @@ def create_schedule():
                     activity_details=activity["details"],
                     start_time=activity["start_time"],
                     end_time=activity["end_time"],
-                    day_of_week=activity["day_of_week"]
+                    day_of_week=request.form.get("day_tabs")
                 )
                 db.session.add(new_activity)
             db.session.commit()
@@ -122,7 +122,7 @@ def create_schedule():
             for error in errors:
                 flash(f"{field}: {error}", "error")
 
-    return render_template("schedule.html", page="Schedule", form=form)
+    return render_template("schedule.html", page="Create schedule", form=form)
 
 @app.route("/api/process-data/", methods=["POST"])
 @login_required
@@ -153,10 +153,30 @@ def process_data():
     Monthly goals:
     {goals_formatted}
 
-    Return the information in a JSON format, a computer will process it so don't format it for human viewing: an object with every day of the week as a number, the values being lists. The lists contain objects with keys start_time, end_time and details for each activity.
+    Return the information in a JSON format, a computer will process it so don't format it for human viewing: an object with every day of the week as a key (the first letter of the day is capital), the values being lists. The lists contain objects with keys start_time, end_time and details for each activity.
     """
+    try:
+        json = send_to_model(prompt)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-    return send_to_model(prompt)
+    user_uuid = userId()
+    Activity.query.filter_by(user_uuid=user_uuid).delete()
+    db.session.commit()
+
+    for day, activities in json.items():
+        for activity in activities:
+            new_activity = Activity(
+                user_uuid=user_uuid,
+                activity_details=activity["details"],
+                start_time=activity["start_time"],
+                end_time=activity["end_time"],
+                day_of_week=day
+            )
+            db.session.add(new_activity)
+    db.session.commit()
+
+    return jsonify(json)
 
 @app.route("/api/get-schedule", methods=["GET"])
 @login_required
@@ -174,54 +194,15 @@ def get_schedule():
         for activity in activities:
             schedule[day].append({
                 "details": activity.activity_details,
-                "start_time": activity.start_time.strftime("%H:%M"),  # Convert to string
-                "end_time": activity.end_time.strftime("%H:%M")       # Convert to string
+                "start_time": activity.start_time.strftime("%H:%M"),
+                "end_time": activity.end_time.strftime("%H:%M")
             })
 
     goals_list = [{"details": goal.goal_details, "hour_goal": goal.hour_goal} for goal in goals]
 
     return jsonify({"schedule": schedule, "goals": goals_list})
 
-@app.route("/api/save-schedule", methods=["POST"])
+@app.route('/generate-schedule', methods=['GET'])
 @login_required
-def save_schedule():
-    try:
-        data = request.json
-        user_uuid = userId()
-
-        # Clear existing activities and goals
-        Activity.query.filter_by(user_uuid=user_uuid).delete()
-        MonthGoal.query.filter_by(user_uuid=user_uuid).delete()
-
-        # Save new activities
-        for day, activities in data["schedule"].items():
-            for activity in activities:
-                new_activity = Activity(
-                    user_uuid=user_uuid,
-                    activity_details=activity["details"],
-                    start_time=activity["start_time"],
-                    end_time=activity["end_time"],
-                    day_of_week=day
-                )
-                db.session.add(new_activity)
-
-        # Save new goals
-        for goal in data["goals"]:
-            new_goal = MonthGoal(
-                user_uuid=user_uuid,
-                goal_details=goal["details"],
-                hour_goal=goal.get("hour_goal")
-            )
-            db.session.add(new_goal)
-
-        db.session.commit()
-        return jsonify({"message": "Schedule and goals saved successfully."}), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/schedule-visualization', methods=['GET'])
-@login_required
-def schedule_visualization():
-    """Render the schedule visualization page."""
-    return render_template('schedule_visualization.html')
+def generate_schedule():
+    return render_template('generate_schedule.html', page="Generate schedule")

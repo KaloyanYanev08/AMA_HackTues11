@@ -8,10 +8,10 @@
             <span class="text-2xl font-bold text-center mb-6 text-primary">Create Schedule</span>
             <div class="tabs tabs-box justify-center bg-white font-semibold">
                 {% set day_names = {'MON': 'Monday', 'TUE': 'Tuesday', 'WED': 'Wednesday', 'THU': 'Thursday', 'FRI': 'Friday', 'SAT': 'Saturday', 'SUN': 'Sunday'} %}
-                {% for day in ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'] %}
-                    <input type="radio" name="day_tabs" class="tab mb-2" aria-label="{{ day }}" id="tab-{{ day }}" {% if loop.first %}checked="unchecked"{% endif %} />
+                {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+                    <input type="radio" name="day_tabs" class="tab mb-2" aria-label="{{ day }}" id="tab-{{ day }}" value="{{ day }}" {% if loop.first %}checked="checked"{% endif %} />
                     <div class="tab-content bg-base-100 border-base-300 p-6 hidden" id="content-{{ day }}">
-                        <h3 class="text-xl font-bold text-center mb-4 text-secondary">Activities for {{ day_names[day] }}</h3>
+                        <h3 class="text-xl font-bold text-center mb-4 text-secondary">Activities for {{ day }}</h3>
                         {% for activity in form.activities %}
                         <div class="flex form-control mb-4 justify-center w-full">
                             <div class="flex-col w-full">
@@ -28,9 +28,6 @@
                                 <label class="label-text text-lg font-semibold">{{ activity.end_time.label }}</label>
                                 {{ activity.end_time(class="input input-bordered text-base", id="activities-{{ loop.index0 }}-end_time") }}
                             </div>
-                        </div>
-                        <div class="form-control hidden">
-                            {{ activity.day_of_week(class="hidden", value=day) }}
                         </div>
                         <hr class="my-4 border-t-2">
                         {% endfor %}

@@ -18,10 +18,6 @@ class ActivityForm(FlaskForm):
     details = StringField('Activity Details', validators=[DataRequired()])
     start_time = TimeField('Start Time', validators=[DataRequired()])
     end_time = TimeField('End Time', validators=[DataRequired()])
-    day_of_week = SelectField('Day of Week', choices=[
-        ('Monday', 'Monday'), ('Tuesday', 'Tuesday'), ('Wednesday', 'Wednesday'),
-        ('Thursday', 'Thursday'), ('Friday', 'Friday'), ('Saturday', 'Saturday'), ('Sunday', 'Sunday')
-    ], validators=[DataRequired()])
 
 class ActivityListForm(FlaskForm):
     activities = FieldList(FormField(ActivityForm), min_entries=1)  # Allow adding multiple activities
