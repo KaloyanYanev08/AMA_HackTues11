@@ -141,28 +141,67 @@ def create_schedule():
             db.session.rollback()
             flash(f"Error saving activities: {str(e)}", "error")
 
-    return render_template("schedule.html", page="Create schedule", form=form)
+    return render_template("create_schedule.html", page="Create schedule", form=form)
 
-@app.route("/view-schedule/")
+from datetime import datetime
+
+@app.route("/view-schedule/", methods=["GET", "POST"])
 @login_required
 def view_schedule():
     user_uuid = userId()
     days_of_the_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
-    schedule = {day: [] for day in days_of_the_week}
-    
+    form = ActivityForm()
+
+    if request.method == "POST":
+        if form.validate_on_submit():
+            activity_id = request.form.get("id")
+            day = request.form.get("day")
+            activity_details = form.details.data
+            start_time = form.start_time.data
+            end_time = form.end_time.data
+
+            if activity_id:  # If an ID is provided, update the existing activity
+                activity = Activity.query.filter_by(id=activity_id, user_uuid=user_uuid).first()
+                if activity:
+                    activity.activity_details = activity_details
+                    activity.start_time = start_time
+                    activity.end_time = end_time
+                    activity.day_of_week = day
+                else:
+                    flash("Activity not found.", "error")
+                    return redirect(url_for("view_schedule"))
+            else:  # Otherwise, create a new activity
+                new_activity = Activity(
+                    user_uuid=user_uuid,
+                    activity_details=activity_details,
+                    start_time=start_time,
+                    end_time=end_time,
+                    day_of_week=day
+                )
+                db.session.add(new_activity)
+
+            db.session.commit()
+            flash("Activity saved successfully!", "success")
+            return redirect(url_for("view_schedule"))
+
+    schedule = {day: [] for day in days_of_the_week}  # Initialize all days with empty lists
+
+    # Add activities to the corresponding days
     for day in days_of_the_week:
         activities = Activity.query.filter_by(user_uuid=user_uuid, day_of_week=day).all()
         if activities:
-            for activity in activities:
+            sorted_activities = sorted(activities, key=lambda activity: activity.start_time)
+            for activity in sorted_activities:
                 schedule[day].append({
+                    "id": activity.id,
                     "details": activity.activity_details,
                     "start_time": activity.start_time.strftime("%H:%M"),
                     "end_time": activity.end_time.strftime("%H:%M"),
                     "is_optimized": activity.is_optimized
                 })
 
-    return render_template("weekly_schedule.html", page="Schedule", schedule=schedule)
+    return render_template("weekly_schedule.html", page="Schedule", schedule=schedule, form=form)
 
 @app.route("/api/process-data/", methods=["POST"])
 @login_required
