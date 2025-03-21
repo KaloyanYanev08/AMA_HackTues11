@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% if not session.id%}
 <div class="hero min-h-screen" style="background-image: url(https://static3.depositphotos.com/1000363/108/i/950/depositphotos_1084893-stock-photo-calendar.jpg);">
     <div class="hero-overlay" style="backdrop-filter: blur(8px);"></div>
     <div class="hero-content text-neutral-content text-center">
@@ -13,4 +14,7 @@
         </div>
     </div>
 </div>
+{% else %}
+<!-- actual homepage goes here -->
+{% endif %}
 {% endblock %}
