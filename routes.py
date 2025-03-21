@@ -6,6 +6,8 @@ from models import User, Activity, MonthGoal
 
 @app.route("/", methods=["GET"])
 def home():
+    if loggedIn():
+        return render_template("stats.html", page="Home")
     return render_template("home.html", page="Home")
 
 @app.route("/register/", methods=["GET", "POST"])
