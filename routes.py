@@ -3,6 +3,7 @@ from forms import LoginForm, RegisterForm, ActivityForm, ActivityListForm
 from config import app, db
 from helpers import login_required, toHash, hasNumber, hasSpecial, userId,loggedIn
 from models import User, Activity, MonthGoal
+from datetime import datetime
 
 @app.route("/", methods=["GET"])
 def home():
@@ -95,37 +96,50 @@ def log_out():
 def create_schedule():
     form = ActivityListForm()
 
-    if form.add_more.data and request.method == "POST":  # Handle adding more activities
-        form.activities.append_entry()
-        return render_template("schedule.html", page="Schedule", form=form)
-
-    if form.validate_on_submit():  # Handle form submission
+    if request.method == "POST":
         user_uuid = userId()
         try:
-            for activity in form.activities.data:
+            # Dynamically process activities from the form data
+            activities = []
+            for key, value in request.form.items():
+                if key.startswith("activities-"):
+                    parts = key.split("-")
+                    index = int(parts[1])
+                    field_name = parts[2]
+
+                    # Ensure the list is large enough to hold all activities
+                    while len(activities) <= index:
+                        activities.append({})
+
+                    activities[index][field_name] = value
+
+            # Validate and save activities
+            for activity in activities:
+                if not activity.get("details") or not activity.get("start_time") or not activity.get("end_time"):
+                    raise Exception("All fields are required for each activity.")
+
                 if "sleep" not in activity["details"].lower() and activity["start_time"] >= activity["end_time"]:
-                    raise Exception("Start time must be less than end time")
+                    raise Exception("Start time must be less than end time.")
+
+                # Convert start_time and end_time to Python time objects
+                start_time_obj = datetime.strptime(activity["start_time"], "%H:%M").time()
+                end_time_obj = datetime.strptime(activity["end_time"], "%H:%M").time()
 
                 new_activity = Activity(
                     user_uuid=user_uuid,
                     activity_details=activity["details"],
-                    start_time=activity["start_time"],
-                    end_time=activity["end_time"],
+                    start_time=start_time_obj,
+                    end_time=end_time_obj,
                     day_of_week=request.form.get("day_tabs")
                 )
                 db.session.add(new_activity)
+
             db.session.commit()
             flash("Schedule created successfully!", "success")
             return redirect(url_for('home'))
         except Exception as e:
             db.session.rollback()
             flash(f"Error saving activities: {str(e)}", "error")
-            return render_template("schedule.html", page="Schedule", form=form)
-
-    if form.errors:
-        for field, errors in form.errors.items():
-            for error in errors:
-                flash(f"{field}: {error}", "error")
 
     return render_template("schedule.html", page="Create schedule", form=form)
 
