@@ -8,6 +8,43 @@
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
         <link href="https://cdn.jsdelivr.net/npm/daisyui@5/themes.css" rel="stylesheet" type="text/css" />
         <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css" />
+        <style>
+            @keyframes slideIn {
+                0% {
+                    transform: translateY(-100%);
+                    opacity: 0;
+                }
+                100% {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes slideOut {
+                0% {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(-100%);
+                    opacity: 0;
+                }
+            }
+
+            .alert-animate {
+                animation: slideIn 0.5s ease forwards;
+                position: fixed;
+                top: 55px;
+                right: 5px;
+                transform: translateX(-50%);
+                z-index: 9999;
+                max-width: 90%;
+            }
+
+            .alert-animate.hide {
+                animation: slideOut 0.5s ease forwards;
+            }
+        </style>
         <meta name="csrf-token" content="{{ csrf_token() }}">
     </head>
     <body class="bg-base-200 text-base-content min-h-screen flex flex-col">
@@ -28,7 +65,23 @@
             </div>
             <div class="flex-1">
             </div>
-        {% if not session.id %}
+        {% if session.id %}
+            <div class="flex-none">
+                <div class="dropdown dropdown-end">
+                    <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+                        <div class="w-10 rounded-full">
+                            <img
+                                src="{{ url_for('static', filename='default-user.jpg') }}"/>
+                        </div>
+                    </div>
+                    <ul tabindex="0" class="mt-3 z-10 p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
+                        <li><a>Profile</a></li>
+                        <li><a>Settings</a></li> <!-- remove maybe -->
+                        <li><a href="{{ url_for('log_out') }}">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        {% else %}
             <div class="flex-none">
                 <a href="{{ url_for('register') }}" class="btn btn-ghost">
                     <span>Register</span>
@@ -37,23 +90,6 @@
                     <span>Log in</span>
                 </a>
             </div>
-        {% else %}
-        <div class="flex-none">
-            <div class="dropdown dropdown-end">
-                <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-                    <div class="w-10 rounded-full">
-                        <img
-                            src="{{ url_for('static', filename='default-user.jpg') }}"
-                        />
-                    </div>
-                </div>
-                <ul tabindex="0" class="mt-3 z-10 p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
-                    <li><a>Profile</a></li>
-                    <li><a>Settings</a></li>
-                    <li><a href="{{ url_for('log_out') }}">Logout</a></li>
-                </ul>
-            </div>
-        </div>
         {% endif %}
         </div>
 
@@ -82,6 +118,16 @@
                 drawerToggle.addEventListener('change', adjustNavbarWidth);
 
                 adjustNavbarWidth();
+
+                const alerts = document.querySelectorAll('.alert-animate');
+                alerts.forEach(alert => {
+                    setTimeout(() => {
+                        alert.classList.add('hide');
+                        setTimeout(() => {
+                            alert.remove();
+                        }, 500);
+                    }, 3500);
+                });
             });
         </script>
 
@@ -90,13 +136,29 @@
             <div class="drawer-side z-40">
                 <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
                 <ul class="menu bg-base-200 text-base-content min-h-full p-4 pt-20" style="width: 25vw; max-width: 300px; min-width: 200px;">
-                    <li><a>Sidebar Item 1</a></li>
-                    <li><a>Sidebar Item 2</a></li>
+                    <li><a href="{{ url_for('create_schedule') }}">Create schedule</a></li>
+                    <li><a href="#">View schedule</a></li>
                 </ul>
             </div>
             <div class="drawer-content min-h-screen flex flex-col">
                 <div class="flex-grow">
                     <div class="pt-16">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert {{ 'alert-error' if category == 'error' else 'alert-success' }} w-96 mx-auto mt-4 alert-animate">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                                            {% if category == 'error' %}
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            {% else %}
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            {% endif %}
+                                        </svg>
+                                        <span>{{ message }}</span>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
                         {% block content %}
                         
                         {% endblock %}
