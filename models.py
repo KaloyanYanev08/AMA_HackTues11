@@ -24,5 +24,4 @@ class MonthGoal(db.Model):
     user_uuid = db.Column(db.String, db.ForeignKey('users.uuid'), nullable=False)
     goal_details = db.Column(db.String, nullable=False)
     hour_goal = db.Column(db.Integer, nullable=True)
-    month = db.Column(db.String, nullable=False)
-    year=db.Column(db.Integer, nullable=False)
+    month = db.Column(db.String, nullable=True)

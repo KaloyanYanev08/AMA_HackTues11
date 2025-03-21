@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">Edit Goal</h1>
+    <form method="POST" class="space-y-4">
+        {{ form.hidden_tag() }}
+        <div class="form-control">
+            {{ form.details.label(class="label-text") }}
+            {% if form.details.errors %}
+                {{ form.details(class="input input-bordered is-invalid", value=goal.goal_details ) }}
+                <div class="invalid-feedback">
+                    {% for error in form.details.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.details(class="input input-bordered", value=goal.goal_details ) }}
+            {% endif %}
+        </div>
+        <div class="form-control">
+            {{ form.hour_goal.label(class="label-text") }}
+            {% if form.hour_goal.errors %}
+                {{ form.hour_goal(class="input input-bordered is-invalid", value=goal.hour_goal ) }}
+                <div class="invalid-feedback">
+                    {% for error in form.hour_goal.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.hour_goal(class="input input-bordered", value=goal.hour_goal ) }}
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary">Update Goal</button>
+    </form>
+    <form method="POST" action="{{ url_for('delete_goal', goal_id=goal.id) }}" class="inline">
+        {{ form.hidden_tag() }}
+        <button type="submit" class="btn btn-sm btn-error">Delete</button>
+    </form>
+</div>
+{% endblock %}

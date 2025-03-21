@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, session, url_for, jsonify, flash
-from forms import LoginForm, RegisterForm, ActivityForm, ActivityListForm
+from forms import LoginForm, RegisterForm, ActivityForm, ActivityListForm, GoalForm
 from config import app, db
 from helpers import login_required, toHash, hasNumber, hasSpecial, userId, loggedIn, calculate_time_diff
 from models import User, Activity, MonthGoal
@@ -152,7 +152,11 @@ def create_schedule():
 
     return render_template("create_schedule.html", page="Create schedule", form=form)
 
-from datetime import datetime
+
+@app.route('/generate-schedule/', methods=['GET'])
+@login_required
+def generate_schedule():
+    return render_template('generate_schedule.html', page="Generate schedule")
 
 @app.route("/view-schedule/", methods=["GET", "POST"])
 @login_required
@@ -307,7 +311,59 @@ def get_schedule():
 
     return jsonify({"schedule": schedule, "goals": goals_list})
 
-@app.route('/generate-schedule/', methods=['GET'])
+@app.route("/add-goal/", methods=["GET", "POST"])
 @login_required
-def generate_schedule():
-    return render_template('generate_schedule.html', page="Generate schedule")
+def add_goal():
+    form = GoalForm()
+    print(request.method, form.validate_on_submit())
+    if request.method == "POST" and form.validate_on_submit():
+        user_uuid = userId()
+        goal_details = form.details.data
+        hour_goal = form.hour_goal.data
+        print(goal_details, hour_goal)
+
+        new_goal = MonthGoal(user_uuid=user_uuid, goal_details=goal_details, hour_goal=hour_goal)
+        db.session.add(new_goal)
+        db.session.commit()
+        flash("Goal added successfully!", "success")
+        return redirect(url_for("view_goals"))
+
+    return render_template("add_goal.html", page="Add Goal", form=form)
+
+@app.route("/edit-goal/<int:goal_id>/", methods=["GET", "POST"])
+@login_required
+def edit_goal(goal_id):
+    goal = MonthGoal.query.filter_by(id=goal_id, user_uuid=userId()).first()
+    if not goal:
+        flash("Goal not found.", "error")
+        return redirect(url_for("view_goals"))
+
+    form = GoalForm(obj=goal)
+    if request.method == "POST" and form.validate_on_submit():
+        goal.goal_details = form.details.data
+        goal.hour_goal = form.hour_goal.data
+        db.session.commit()
+        flash("Goal updated successfully!", "success")
+        return redirect(url_for("view_goals"))
+
+    return render_template("edit_goal.html", page="Edit Goal", form=form, goal=goal)
+
+@app.route("/delete-goal/<int:goal_id>/", methods=["POST"])
+@login_required
+def delete_goal(goal_id):
+    goal = MonthGoal.query.filter_by(id=goal_id, user_uuid=userId()).first()
+    if not goal:
+        flash("Goal not found.", "error")
+        return redirect(url_for("view_goals"))
+
+    db.session.delete(goal)
+    db.session.commit()
+    flash("Goal deleted successfully!", "success")
+    return redirect(url_for("view_goals"))
+
+@app.route("/view-goals/", methods=["GET"])
+@login_required
+def view_goals():
+    user_uuid = userId()
+    goals = MonthGoal.query.filter_by(user_uuid=user_uuid).all()
+    return render_template("view_goals.html", page="View Goals", goals=goals)
