@@ -29,7 +29,6 @@ class ActivityListForm(FlaskForm):
 
 class GoalForm(FlaskForm):
     details = StringField('Goal Details', validators=[DataRequired()])
-    hour_goal = IntegerField('Hour Goal (Optional)')
-    month = StringField('Month', validators=[DataRequired()])
-    year = IntegerField('Year', validators=[DataRequired()])
+    hour_goal = IntegerField('Hour Goal (Optional)', default=0)
+    month = StringField('Month')
 

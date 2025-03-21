@@ -137,8 +137,7 @@
                     const goalDiv = document.createElement('div');
                     goalDiv.classList.add('mb-2');
                     goalDiv.innerHTML = `
-                        <input type="text" name="goal-details-${index}" value="${goal.details}" placeholder="Goal Details" class="input input-bordered w-full mb-2">
-                        <input type="number" name="goal-hours-${index}" value="${goal.hour_goal || ''}" placeholder="Hour Goal (Optional)" class="input input-bordered w-full">
+                        <p>${goal.details} - ${goal.hour_goal || 'Unspecified'} hours</p>
                     `;
                     goalsContainer.appendChild(goalDiv);
                 });
