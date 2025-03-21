@@ -25,3 +25,9 @@ class MonthGoal(db.Model):
     goal_details = db.Column(db.String, nullable=False)
     hour_goal = db.Column(db.Integer, nullable=True)
     month = db.Column(db.String, nullable=True)
+
+class AICache(db.Model):
+    __tablename__ = 'ai_caches'
+    activities_json = db.Column(db.String, nullable=False)
+    goals_json = db.Column(db.String, nullable=False)
+    response_json = db.Column(db.String, primary_key=True)

@@ -2,76 +2,47 @@
 
 {% block content %}
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="card bg-base-100 shadow-xl mb-8">
+    <!-- Welcome Card -->
+    <div class="card bg-base-100 shadow-xl mb-8 backdrop-blur-sm bg-opacity-80">
         <div class="card-body">
-            <h1 class="card-title text-3xl sm:text-4xl md:text-5xl font-bold text-center">Welcome to Your Dashboard{% if username %}, {{ username }}{% endif %}</h1>
+            <h1 class="card-title text-3xl sm:text-4xl md:text-5xl font-bold text-center bg-black bg-clip-text text-transparent drop-shadow-md">
+                Welcome to Your Dashboard{% if username %}, {{ username }}{% endif %}
+            </h1>
         </div>
     </div>
 
+    <!-- Main Grid Layout -->
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <!-- Pie Chart Box -->
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body p-4 aspect-square">
-                <canvas id="pieChart" class="rounded-lg w-full h-full"></canvas>
+        <!-- Pie Chart Card -->
+        <div class="card bg-base-100 shadow-xl backdrop-blur-sm bg-opacity-80">
+            <div class="card-body">
+                <h2 class="card-title text-xl sm:text-2xl font-bold text-center mb-4 text-primary">Weekly Activities</h2>
+                <div class="aspect-square relative">
+                    <canvas id="pieChart" class="rounded-lg"></canvas>
+                </div>
             </div>
         </div>
 
-        <!-- Activities Box -->
-        <div class="card bg-base-100 shadow-xl lg:col-span-3">
+        <!-- Today's Activities Card -->
+        <div class="card bg-base-100 shadow-xl backdrop-blur-sm bg-opacity-80 lg:col-span-3">
             <div class="card-body">
-                <h2 class="card-title text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6">Today's schedule</h2>
-
-                <div class="space-y-6">
-                    <div class="flex items-center gap-4">
-                        <div class="w-4 h-4 rounded-full bg-gradient-to-r from-[#FF2323] to-[#FF6D1F]"></div>
-                        <span class="flex-1">Activity 1</span>
-                        <div class="w-32 sm:w-48 h-3 bg-base-200 rounded-full overflow-hidden">
-                            <div class="bg-gradient-to-r from-[#FF2323] to-[#FF6D1F] h-full rounded-full transition-all duration-500" style="width: 60%"></div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-4">
-                        <div class="w-4 h-4 rounded-full bg-gradient-to-r from-[#FFB800] to-[#FF6D1F]"></div>
-                        <span class="flex-1">Activity 2</span>
-                        <div class="w-32 sm:w-48 h-3 bg-base-200 rounded-full overflow-hidden">
-                            <div class="bg-gradient-to-r from-[#FFB800] to-[#FF6D1F] h-full rounded-full transition-all duration-500" style="width: 80%"></div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-4">
-                        <div class="w-4 h-4 rounded-full bg-gradient-to-r from-[#FF6D1F] to-[#FFB800]"></div>
-                        <span class="flex-1">Activity 3</span>
-                        <div class="w-32 sm:w-48 h-3 bg-base-200 rounded-full overflow-hidden">
-                            <div class="bg-gradient-to-r from-[#FF6D1F] to-[#FFB800] h-full rounded-full transition-all duration-500" style="width: 40%"></div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-4">
-                        <div class="w-4 h-4 rounded-full bg-gradient-to-r from-[#FF4E00] to-[#FF9F00]"></div>
-                        <span class="flex-1">Activity 4</span>
-                        <div class="w-32 sm:w-48 h-3 bg-base-200 rounded-full overflow-hidden">
-                            <div class="bg-gradient-to-r from-[#FF4E00] to-[#FF9F00] h-full rounded-full transition-all duration-500" style="width: 75%"></div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-4">
-                        <div class="w-4 h-4 rounded-full bg-gradient-to-r from-[#7F00FF] to-[#9D00FF]"></div>
-                        <span class="flex-1">Activity 5</span>
-                        <div class="w-32 sm:w-48 h-3 bg-base-200 rounded-full overflow-hidden">
-                            <div class="bg-gradient-to-r from-[#7F00FF] to-[#9D00FF] h-full rounded-full transition-all duration-500" style="width: 90%"></div>
-                        </div>
-                    </div>
+                <h2 class="card-title text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 text-primary">
+                    Today's Activities
+                    <span class="text-lg sm:text-xl md:text-2xl opacity-75" id="currentDate"></span>
+                </h2>
+                <div class="space-y-4" id="activitiesContainer">
+                    <!-- Activities will be populated by JavaScript -->
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Summary Box -->
-    <div class="card bg-base-100 shadow-xl mt-8">
+    <!-- Summary Card -->
+    <div class="card bg-base-100 shadow-xl mt-8 backdrop-blur-sm bg-opacity-80">
         <div class="card-body prose max-w-none">
-            <h2 class="card-title">Summary</h2>
-            <p class="text-xl">
-                Text goes here
+            <h2 class="card-title text-primary">Summary</h2>
+            <p class="text-xl opacity-80">
+                
             </p>
         </div>
     </div>
@@ -79,45 +50,97 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', function() {
+        // Parse the Flask template variables safely
+        const weeklySummary = JSON.parse('{{ weekly_summary|tojson|safe }}');
+        const todayActivities = JSON.parse('{{ today_activities|tojson|safe }}');
+        
+        // Set current date in the header
+        const now = new Date();
+        const dateOptions = { 
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        };
+        const formattedDate = now.toLocaleDateString('en-US', dateOptions);
+        document.getElementById('currentDate').textContent = `(${formattedDate})`;
+
         const ctx = document.getElementById('pieChart').getContext('2d');
+        const activitiesContainer = document.getElementById('activitiesContainer');
 
-        const gradients = [
-            ctx.createLinearGradient(0, 0, 0, 400),
-            ctx.createLinearGradient(0, 0, 0, 400),
-            ctx.createLinearGradient(0, 0, 0, 400),
-            ctx.createLinearGradient(0, 0, 0, 400),
-            ctx.createLinearGradient(0, 0, 0, 400)
-        ];
-
-        const colorPairs = [
-            ['#FF2323', '#FF6D1F'],
-            ['#FFB800', '#FF6D1F'],
-            ['#FF6D1F', '#FFB800'],
-            ['#FF4E00', '#FF9F00'],
-            ['#7F00FF', '#9D00FF']
-        ];
-
-        const selectedGradients = gradients.slice(0, 5);
-        const selectedLabels = ['Activity 1', 'Activity 2', 'Activity 3', 'Activity 4', 'Activity 5'];
-
-        selectedGradients.forEach((gradient, index) => {
-            gradient.addColorStop(0, colorPairs[index][0]);
-            gradient.addColorStop(1, colorPairs[index][1]);
-        });
-
-        const resizeChart = () => {
-            const container = ctx.canvas.parentElement;
-            ctx.canvas.height = container.clientWidth;
+        // Format time helper function
+        const formatTime = (timeStr) => {
+            const [hours, minutes] = timeStr.split(':');
+            return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
         };
 
-        const pieChart = new Chart(ctx, {
+        // Color palette generator
+        const generateColorPalette = (index, total) => {
+            // Predefined vibrant base colors (in HSL format)
+            const baseColors = [
+                [0, 100, 50],    // Red
+                [30, 100, 50],   // Orange
+                [60, 100, 50],   // Yellow
+                [120, 100, 40],  // Green
+                [200, 100, 50],  // Blue
+                [280, 100, 50],  // Purple
+                [320, 100, 50]   // Pink
+            ];
+
+            // Get base color based on index
+            const baseColor = baseColors[index % baseColors.length];
+            
+            // Create gradient by shifting hue for the second color
+            const hueShift = 30; // degrees
+            const secondColor = [
+                (baseColor[0] + hueShift) % 360,
+                baseColor[1],
+                baseColor[2]
+            ];
+
+            return [
+                `hsl(${baseColor[0]}, ${baseColor[1]}%, ${baseColor[2]}%)`,
+                `hsl(${secondColor[0]}, ${secondColor[1]}%, ${secondColor[2]}%)`
+            ];
+        };
+
+        // Generate activity colors dynamically
+        const activityColors = {};
+        const uniqueActivities = [...new Set([
+            ...Object.keys(weeklySummary),
+            ...todayActivities.map(activity => activity.details)
+        ])];
+
+        uniqueActivities.forEach((activity, index) => {
+            activityColors[activity] = generateColorPalette(index, uniqueActivities.length);
+        });
+
+        // Create and store all gradients
+        const gradientMap = {};
+        uniqueActivities.forEach(activity => {
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            const colors = activityColors[activity];
+            gradient.addColorStop(0, colors[0]);
+            gradient.addColorStop(1, colors[1]);
+            gradientMap[activity] = gradient;
+        });
+
+        // Prepare data for pie chart
+        const labels = Object.keys(weeklySummary);
+        const data = Object.values(weeklySummary);
+
+        // Get gradients for pie chart
+        const chartGradients = labels.map(label => gradientMap[label]);
+
+        // Initialize pie chart
+        new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: selectedLabels,
+                labels: labels,
                 datasets: [{
-                    data: [10, 20, 30, 25, 15],
-                    backgroundColor: selectedGradients,
+                    data: data,
+                    backgroundColor: chartGradients,
                     borderWidth: 2,
                     borderColor: '#ffffff',
                     borderRadius: 10,
@@ -129,12 +152,73 @@
                 cutout: '85%',
                 plugins: {
                     legend: {
-                        display: false
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 15,
+                            font: {
+                                family: 'system-ui'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const value = Number(context.raw).toFixed(1);
+                                const label = context.label || '';
+                                return `${label}: ${value} hours`;
+                            }
+                        },
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14,
+                            family: 'system-ui'
+                        },
+                        bodyFont: {
+                            size: 14,
+                            family: 'system-ui'
+                        },
+                        displayColors: true,
+                        boxWidth: 10
                     }
                 },
-                maintainAspectRatio: false,
+                maintainAspectRatio: true,
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
+                }
             }
         });
+
+        // Populate today's activities
+        if (todayActivities && todayActivities.length > 0) {
+            const activityElements = todayActivities.map((activity) => {
+                const colors = activityColors[activity.details];
+                const startTime = formatTime(activity.start_time);
+                const endTime = formatTime(activity.end_time);
+                
+                return `
+                    <div class="flex items-center gap-4 p-4 rounded-lg bg-base-200 bg-opacity-50">
+                        <div class="w-4 h-4 rounded-full" style="background: linear-gradient(to right, ${colors[0]}, ${colors[1]})"></div>
+                        <span class="flex-1 font-medium">${activity.details}</span>
+                        <span class="text-sm opacity-75 font-mono">${startTime} - ${endTime}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            activitiesContainer.innerHTML = activityElements;
+        } else {
+            activitiesContainer.innerHTML = '<p class="text-center text-gray-500 italic">No activities scheduled for today</p>';
+        }
+
+        // Handle responsive chart sizing
+        const resizeChart = () => {
+            const container = ctx.canvas.parentElement;
+            ctx.canvas.style.width = '100%';
+            ctx.canvas.style.height = '100%';
+        };
 
         window.addEventListener('resize', resizeChart);
         resizeChart();

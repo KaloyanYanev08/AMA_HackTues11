@@ -2,13 +2,19 @@ from flask import render_template, request, redirect, session, url_for, jsonify,
 from forms import LoginForm, RegisterForm, ActivityForm, ActivityListForm, GoalForm
 from config import app, db
 from helpers import login_required, toHash, hasNumber, hasSpecial, userId, loggedIn, calculate_time_diff
-from models import User, Activity, MonthGoal
+from models import User, Activity, MonthGoal, AICache
 from datetime import datetime
 
 @app.route("/", methods=["GET"])
 def home():
     if loggedIn():
         user_uuid = userId()
+        user = User.query.filter_by(uuid=user_uuid).first()
+        username = user.username if user else None
+        
+        today = datetime.now().strftime('%A')
+        
+        # Get weekly summary
         activities = Activity.query.filter_by(user_uuid=user_uuid).all()
         weekly_summary = {}
         for activity in activities:
@@ -16,8 +22,27 @@ def home():
                 weekly_summary[activity.activity_details] += calculate_time_diff(activity.start_time, activity.end_time)
             else:
                 weekly_summary[activity.activity_details] = calculate_time_diff(activity.start_time, activity.end_time)
+        
+        today_activities = Activity.query.filter_by(
+            user_uuid=user_uuid,
+            day_of_week=today
+        ).order_by(Activity.start_time).all()
+        
+        today_activities_list = []
+        for activity in today_activities:
+            today_activities_list.append({
+                'details': activity.activity_details,
+                'start_time': activity.start_time.strftime('%H:%M'),
+                'end_time': activity.end_time.strftime('%H:%M')
+            })
 
-        return render_template("stats.html", page="Home", weekly_summary=weekly_summary)
+        return render_template(
+            "stats.html",
+            page="Home",
+            username=username,
+            weekly_summary=weekly_summary,
+            today_activities=today_activities_list
+        )
     return render_template("home.html", page="Home")
 
 @app.route("/register/", methods=["GET", "POST"])
@@ -219,7 +244,10 @@ def view_schedule():
 @app.route("/api/process-data/", methods=["POST"])
 @login_required
 def process_data():
+    from json import loads, dumps
     from ai_client import send_to_model
+
+    user_uuid = userId()
 
     data = request.json
 
@@ -247,8 +275,13 @@ def process_data():
 
     Return the information in a JSON format, a computer will process it so don't format it for human viewing: an object with every day of the week as a key (the first letter of the day is capital), the values being lists. The lists contain objects with keys start_time, end_time and details for each activity.
     """
+
     try:
-        json = send_to_model(prompt)
+        cached_copy = AICache.query.filter_by(activities_json=schedule_formatted, goals_json=goals_formatted).first()
+        if cached_copy is not None:
+            json = loads(cached_copy["response_json"])
+        else:
+            json = send_to_model(prompt)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
@@ -257,7 +290,12 @@ def process_data():
 
     print(json)
 
-    user_uuid = userId()
+    cached = AICache(
+            activities_json=schedule_formatted,
+            goals_json=goals_formatted,
+            ai_json=dumps(json)
+    )
+        
     #old_activities = Activity.query.filter_by(user_uuid=user_uuid).all().copy()
     
     Activity.query.filter_by(user_uuid=user_uuid).delete()
@@ -284,6 +322,10 @@ def process_data():
             )
             db.session.add(new_activity)
     db.session.commit()
+
+    if cached_copy is None:
+        db.session.add(cached)
+        db.session.commit()
 
     return jsonify(json)
 
