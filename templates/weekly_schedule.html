@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+</head>
+<body class="font-sans">
+    <div class="lg:hidden container mx-auto p-4">
+        <h1 class="text-2xl font-bold text-center my-4">Weekly Tracker</h1>
+        <div class="flex flex-row justify-center items-center">
+            <div class="flex flex-col justify-center items-center">
+                <button class="day-button btn btn-primary w-32" data-day="Monday">Monday</button>
+                <button class="day-button btn btn-primary w-32" data-day="Tuesday">Tuesday</button>
+                <button class="day-button btn btn-primary w-32" data-day="Wednesday">Wednesday</button>
+                <button class="day-button btn btn-primary w-32" data-day="Thursday">Thursday</button>
+                <button class="day-button btn btn-primary w-32" data-day="Friday">Friday</button>
+                <button class="day-button btn btn-primary w-32" data-day="Saturday">Saturday</button>
+                <button class="day-button btn btn-primary w-32" data-day="Sunday">Sunday</button>
+            </div>
+            <div id="activities" class=" flex-grow min-w-[60%]">
+                
+                <!-- Activity cards will be displayed here -->
+            </div>
+        </div>
+    </div>
+    <div class="hidden lg:block">
+            <h2 class="text-xl font-bold text-center my-4">Weekly Overview</h2>
+            <div class="grid grid-cols-7 gap-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-center">Monday</h3>
+                    <div id="monday-activities" class="activities-container"></div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-center">Tuesday</h3>
+                    <div id="tuesday-activities" class="activities-container"></div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-center">Wednesday</h3>
+                    <div id="wednesday-activities" class="activities-container"></div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-center">Thursday</h3>
+                    <div id="thursday-activities" class="activities-container"></div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-center">Friday</h3>
+                    <div id="friday-activities" class="activities-container"></div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-center">Saturday</h3>
+                    <div id="saturday-activities" class="activities-container"></div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-center">Sunday</h3>
+                    <div id="sunday-activities" class="activities-container"></div>
+                </div>
+            </div>
+        </div>
+    <script>
+        const activities = {
+            "Monday": [
+                { title: "Activity 1", description: "Description 1", startTime: "09:00", endTime: "10:00" },
+                { title: "Activity 2", description: "Description 2", startTime: "11:00", endTime: "12:00" }
+            ],
+            "Tuesday": [
+                { title: "Activity 3", description: "Description 3", startTime: "10:00", endTime: "11:00" }
+            ],
+            // ... Add activities for other days
+        };
+
+        const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+        const buttons = document.querySelectorAll('.day-button');
+        let lastClickedButton = null;
+
+        function showActivities(day) {
+            const dayActivities = activities[day] || [];
+            const activitiesContainer = document.getElementById('activities');
+            activitiesContainer.innerHTML = '';
+            dayActivities.forEach(activity => {
+                const card = document.createElement('div');
+                card.className = 'card border p-4 m-2';
+                card.innerHTML = `
+                    <h2 class="text-lg font-semibold">${activity.title}</h2>
+                    <p>${activity.description}</p>
+                    <p><strong>Start:</strong> ${activity.startTime}</p>
+                    <p><strong>End:</strong> ${activity.endTime}</p>
+                `;
+                activitiesContainer.appendChild(card);
+            });
+        }
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                if (lastClickedButton) {
+                    lastClickedButton.classList.remove('btn-active');
+                }
+                button.classList.add('btn-active');
+                lastClickedButton = button;
+                const day = button.getAttribute('data-day');
+                showActivities(day);
+            });
+        });
+
+        // Show today's activities on page load
+        const todayButton = Array.from(buttons).find(button => button.getAttribute('data-day') === today);
+        if (todayButton) {
+            todayButton.click();
+        }
+
+        function showWeeklyOverview() {
+            Object.keys(activities).forEach(day => {
+                const dayActivities = activities[day] || [];
+                const activitiesContainer = document.getElementById(`${day.toLowerCase()}-activities`);
+                activitiesContainer.innerHTML = '';
+                dayActivities.forEach(activity => {
+                    const card = document.createElement('div');
+                    card.className = 'card border p-4 m-2';
+                    card.innerHTML = `
+                        <h2 class="text-lg font-semibold">${activity.title}</h2>
+                        <p>${activity.description}</p>
+                        <p><strong>Start:</strong> ${activity.startTime}</p>
+                        <p><strong>End:</strong> ${activity.endTime}</p>
+                    `;
+                    activitiesContainer.appendChild(card);
+                });
+            });
+        }
+
+        // Show weekly overview on page load for larger screens
+        if (window.innerWidth >= 1024) {
+            showWeeklyOverview();
+        }
+    </script>
+</body>
+</html>
+
