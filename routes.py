@@ -124,6 +124,26 @@ def create_schedule():
 
     return render_template("schedule.html", page="Create schedule", form=form)
 
+@app.route("/view-schedule/")
+@login_required
+def view_schedule():
+    user_uuid = userId()
+    days_of_the_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+    schedule = {}
+    for day in days_of_the_week:
+        activities = Activity.query.filter_by(user_uuid=user_uuid, day_of_week=day).all()
+        if activities:
+            schedule[day] = []
+            for activity in activities:
+                schedule[day].append({
+                    "details": activity.activity_details,
+                    "start_time": activity.start_time.strftime("%H:%M"),
+                    "end_time": activity.end_time.strftime("%H:%M")
+                })
+
+    return render_template("weekly_schedule.html", page="Schedule", schedule=schedule)
+
 @app.route("/api/process-data/", methods=["POST"])
 @login_required
 def process_data():
@@ -178,7 +198,7 @@ def process_data():
 
     return jsonify(json)
 
-@app.route("/api/get-schedule", methods=["GET"])
+@app.route("/api/get-schedule/", methods=["GET"])
 @login_required
 def get_schedule():
     user_uuid = userId()
@@ -202,7 +222,7 @@ def get_schedule():
 
     return jsonify({"schedule": schedule, "goals": goals_list})
 
-@app.route('/generate-schedule', methods=['GET'])
+@app.route('/generate-schedule/', methods=['GET'])
 @login_required
 def generate_schedule():
     return render_template('generate_schedule.html', page="Generate schedule")
