@@ -15,14 +15,17 @@ class RegisterForm(FlaskForm):
     submit=SubmitField('Register')
 
 class ActivityForm(FlaskForm):
-    details = StringField('Activity Details', validators=[DataRequired()])
-    start_time = TimeField('Start Time', validators=[DataRequired()])
-    end_time = TimeField('End Time', validators=[DataRequired()])
+    details = StringField("Activity Details", validators=[DataRequired(message="This field is required.")])
+    start_time = TimeField("Start Time", validators=[DataRequired(message="This field is required.")])
+    end_time = TimeField("End Time", validators=[DataRequired(message="This field is required.")])
 
 class ActivityListForm(FlaskForm):
-    activities = FieldList(FormField(ActivityForm), min_entries=1)  # Allow adding multiple activities
-    add_more = SubmitField('+ Add More')
-    submit = SubmitField('Save Activities')
+    activities = FieldList(
+        FormField(ActivityForm),
+        min_entries=1,
+        validators=[DataRequired(message="At least one activity is required.")]
+    )
+    submit = SubmitField("Save Activities")
 
 class GoalForm(FlaskForm):
     details = StringField('Goal Details', validators=[DataRequired()])

@@ -24,6 +24,7 @@ def userId():
         return None
 
 def loggedIn():
+    if User.query.filter_by(uuid=str(userId())).first() is None and "id" in session: del session["id"]
     try:
         return "id" in session and User.query.filter_by(uuid=str(userId())).first() is not None
     except:
