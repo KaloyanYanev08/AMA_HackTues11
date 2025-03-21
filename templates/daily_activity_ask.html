@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-base-200">
+    <div class="text-center bg-base-100 p-8 rounded-lg shadow-lg">
+        <h1 class="text-4xl font-bold mb-4 text-primary">What did you do today?</h1>
+        <!-- {% for activity in activities %}-->
+        <p class="mb-6">Please select the activities you did today:</p>
+            <form method="POST" action="{{ url_for('daily_activity_ask') }}">
+                <div class="form-control mb-4">
+                    <label class="label cursor-pointer">
+                        <span class="label-text">Activity 1</span>
+                        <input type="number" name="activity1" min="0" max="24" class="checkbox checkbox-primary" value="Activity 1">
+                </div>
+                <!-- {% endfor %}-->
+            </form>
+    </div>
+</div>
+{% endblock content %}
