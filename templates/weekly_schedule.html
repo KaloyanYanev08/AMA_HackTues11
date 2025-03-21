@@ -15,7 +15,7 @@
                     <div class="collapse-content">
                         <div id="{{ day | lower }}-activities" class="space-y-2 pt-3">
                             {% for activity in activities %}
-                                <div class="card border rounded-lg p-3 hover:shadow-lg transition-shadow duration-200">
+                                <div class="card border rounded-lg p-3 hover:shadow-lg transition-shadow duration-200 {{ 'bg-warning' if activity.is_optimized else '' }}">
                                     <h4 class="text-md font-semibold">{{ activity.details }}</h4>
                                     <div class="text-sm mt-2">
                                         <p class="flex items-center"><span class="font-medium mr-2">Start:</span> {{ activity.start_time }}</p>

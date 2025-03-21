@@ -118,8 +118,8 @@ def create_schedule():
                 if not activity.get("details") or not activity.get("start_time") or not activity.get("end_time"):
                     raise Exception("All fields are required for each activity.")
 
-                if "sleep" not in activity["details"].lower() and activity["start_time"] >= activity["end_time"]:
-                    raise Exception("Start time must be less than end time.")
+                #if "sleep" not in activity["details"].lower() and activity["start_time"] >= activity["end_time"]:
+                #    raise Exception("Start time must be less than end time.")
 
                 # Convert start_time and end_time to Python time objects
                 start_time_obj = datetime.strptime(activity["start_time"], "%H:%M").time()
@@ -149,9 +149,8 @@ def view_schedule():
     user_uuid = userId()
     days_of_the_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
-    schedule = {day: [] for day in days_of_the_week}  # Initialize all days with empty lists
+    schedule = {day: [] for day in days_of_the_week}
     
-    # Add activities to the corresponding days
     for day in days_of_the_week:
         activities = Activity.query.filter_by(user_uuid=user_uuid, day_of_week=day).all()
         if activities:
@@ -159,7 +158,8 @@ def view_schedule():
                 schedule[day].append({
                     "details": activity.activity_details,
                     "start_time": activity.start_time.strftime("%H:%M"),
-                    "end_time": activity.end_time.strftime("%H:%M")
+                    "end_time": activity.end_time.strftime("%H:%M"),
+                    "is_optimized": activity.is_optimized
                 })
 
     return render_template("weekly_schedule.html", page="Schedule", schedule=schedule)
@@ -186,7 +186,7 @@ def process_data():
 
     # Construct the prompt
     prompt = f"""
-    You are an assistant with the task to modify a person's schedule to be most healthy and optimal. Optimal sleeping hours: 8 hours. Do not change work if not prompted to. Explicitly allocate time for the things the user wants. You are allowed to add exercise between activities if you are asked to add sports. For example add a quality of life improving task between them. It's also important to let people take breaks and have free time as well, so try to fit in some. The \"Monthly goal\" section applies to all days. Try to not overthink. I want you to modify the following days:
+    You are an assistant with the task to modify a person's schedule to be most healthy and optimal. Optimal sleeping hours: 8 hours. Do not change work if not prompted to. Explicitly allocate time for the things the user wants. You are allowed to add exercise between activities if you are asked to add sports. For example add a quality of life improving task between them. It's also important to let people take breaks and have free time as well, so try to fit in some. The \"Monthly goal\" section applies to all days. The activity's name must be 3 words maximum, preferrably 1. Try to not overthink. I want you to modify the following days:
     
     {schedule_formatted}
 
@@ -199,19 +199,36 @@ def process_data():
         json = send_to_model(prompt)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+    if len(json.keys()) == 0:
+        return jsonify({"error": "No activities found in the response."}), 500
+
+    print(json)
 
     user_uuid = userId()
+    old_activities = Activity.query.filter_by(user_uuid=user_uuid).all().copy()
+    
     Activity.query.filter_by(user_uuid=user_uuid).delete()
     db.session.commit()
 
     for day, activities in json.items():
         for activity in activities:
+            #is_optimized = not any(
+            #   old_activity.activity_details == activity["details"] and
+            #   old_activity.start_time.strftime("%H:%M") == activity["start_time"] and
+            #   old_activity.end_time.strftime("%H:%M") == activity["end_time"] and
+            #   old_activity.day_of_week == day
+            #   for old_activity in old_activities
+            #)
+            is_optimized = False
+
             new_activity = Activity(
                 user_uuid=user_uuid,
                 activity_details=activity["details"],
-                start_time=activity["start_time"],
-                end_time=activity["end_time"],
-                day_of_week=day
+                start_time=datetime.strptime(activity["start_time"], "%H:%M").time(),
+                end_time=datetime.strptime(activity["end_time"], "%H:%M").time(),
+                day_of_week=day,
+                is_optimized=is_optimized
             )
             db.session.add(new_activity)
     db.session.commit()

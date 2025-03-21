@@ -16,6 +16,7 @@ class Activity(db.Model):
     end_time = db.Column(db.Time, nullable=False)
     day_of_week = db.Column(db.String, nullable=False)
     date=db.Column(db.DateTime, nullable=False, default=datetime.now(timezone.utc))
+    is_optimized = db.Column(db.Boolean, default=False)
 
 class MonthGoal(db.Model):
     __tablename__ = 'month_goals'
