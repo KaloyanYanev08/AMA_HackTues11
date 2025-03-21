@@ -145,7 +145,7 @@ def create_schedule():
 
             db.session.commit()
             flash("Schedule created successfully!", "success")
-            return redirect(url_for('home'))
+            return redirect(url_for('create_schedule'))
         except Exception as e:
             db.session.rollback()
             flash(f"Error saving activities: {str(e)}", "error")
