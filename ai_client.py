@@ -1,5 +1,7 @@
-from flask import jsonify
+from flask import jsonify, Response
 from ollama import Client, ResponseError
+from re import search as regex
+from re import DOTALL
 
 from config import ollama_model, ollama_endpoint
 
@@ -8,14 +10,29 @@ def send_to_model(prompt):
         client = Client(
             host=ollama_endpoint
         )
-        response = client.chat(
+        response = dict(client.chat(
             model=ollama_model,
             messages=[{'role': 'user', 'content': prompt}],
             stream=False
-        )
+        ))
         
-        if response["done"] and response["done"]["done_reason"] != 'stop':
+        print(response)
+
+        print("\n\n\n\n\n\n\n")
+
+        if not response["done"] or response["done_reason"] != 'stop':
             raise ResponseError("Response stopped prematurely")
-        return jsonify(dict(response))
+        
+        end_of_reason = regex(r"\s*</think>\s*(.*)", response["message"]["content"], DOTALL)
+        json_resp = ""
+        if end_of_reason:
+            json_resp = end_of_reason.group(1).replace("```json", "").replace("```", "").strip()
+        else:
+            raise ResponseError("Response format is incorrect")
+
+        return Response(
+            json_resp,
+            mimetype='application/json'
+        )
     except Exception as e:
         return jsonify({"error": str(e)}), 500
