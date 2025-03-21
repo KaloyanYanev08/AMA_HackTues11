@@ -268,7 +268,7 @@ def process_data():
     cached = AICache(
             activities_json=schedule_formatted,
             goals_json=goals_formatted,
-            ai_json=dumps(json)
+            response_json=dumps(json)
     )
         
     #old_activities = Activity.query.filter_by(user_uuid=user_uuid).all().copy()
