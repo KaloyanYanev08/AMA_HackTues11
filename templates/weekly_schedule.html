@@ -8,9 +8,10 @@
         <div class="space-y-4">
             {% for day, activities in schedule.items() %}
                 <div class="collapse bg-base-100 border-base-300 border rounded-lg">
-                    <input type="checkbox" />
-                    <div class="collapse-title font-semibold text-center bg-primary text-white rounded-t-lg">
-                        {{ day }}
+
+                    <input type="checkbox"/>
+                    <div class="collapse-title font-semibold bg-primary text-white rounded-t-lg px-16">
+                        <p class="text-center">{{ day }}</p>
                     </div>
                     <div class="collapse-content">
                         <div id="{{ day | lower }}-activities" class="space-y-2 pt-3">
