@@ -141,7 +141,7 @@ def create_schedule():
             db.session.rollback()
             flash(f"Error saving activities: {str(e)}", "error")
 
-    return render_template("schedule.html", page="Create schedule", form=form)
+    return render_template("create_schedule.html", page="Create schedule", form=form)
 
 @app.route("/view-schedule/")
 @login_required
