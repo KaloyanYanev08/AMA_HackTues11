@@ -47,16 +47,12 @@
             </form>
         </div>
 
-        <button id="submit-to-ai" class=" bg-black btn-ghost btn btn-success text-primary-content">
+        <button id="submit-to-ai" class="bg-black btn-ghost btn btn-success text-primary-content">
             <img src="{{ url_for('static', filename='weather-lightning-rounded-thunder-flash.svg') }}" alt="Logo" class="h-6 invert">
-            Optimize
+            <span id="button-text">Optimize</span>
         </button>
 
         <div id="ai-processing" class="hidden mt-4">
-            <div class="flex items-center">
-                <div class="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-500"></div>
-                <span class="ml-2">Processing...</span>
-            </div>
         </div>
 
         <div id="ai-error" class="hidden mt-4 text-red-500">
@@ -70,7 +66,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             const scheduleContainer = document.getElementById('schedule-container');
             const goalsContainer = document.getElementById('goal-fields');
-            const addGoalButton = document.getElementById('add-goal');
             const submitToAIButton = document.getElementById('submit-to-ai');
             const aiProcessing = document.getElementById('ai-processing');
             const aiError = document.getElementById('ai-error');
@@ -154,16 +149,24 @@
 
             // Submit to AI
             submitToAIButton.addEventListener('click', () => {
+                // Update button state
+                submitToAIButton.disabled = true;
+                submitToAIButton.classList.add('opacity-50', 'cursor-not-allowed');
+                document.getElementById('button-text').textContent = 'Processing...';
+
+                // Change SVG to loading spinner
+                const buttonIcon = submitToAIButton.querySelector('img');
+                const loadingSpinner = document.createElement('span');
+                loadingSpinner.classList.add('loading', 'loading-infinity', 'loading-xl');
+                submitToAIButton.replaceChild(loadingSpinner, buttonIcon);
+                
                 aiProcessing.classList.remove('hidden');
                 aiError.classList.add('hidden');
-                submitToAIButton.classList.add('disabled');
 
                 const goals = Array.from(goalsContainer.querySelectorAll('input[name="goal-details"]')).map((input, index) => ({
                     details: input.value,
                     hour_goal: goalsContainer.querySelector(`input[name="goal-hours-${index}"]`)?.value || null
                 }));
-
-                //console.log(JSON.stringify({ schedule: currentSchedule, monthly_goals: goals }))
 
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
@@ -176,12 +179,23 @@
                     body: JSON.stringify({ schedule: currentSchedule, monthly_goals: goals })
                 })
                     .then(data => {
-                        aiProcessing.classList.add('hidden');
-                        location.href = "/view-schedule/";
+                        const delay = Math.floor(Math.random() * (5000 - 3000 + 1)) + 3000;
+                        setTimeout(() => {
+                            aiProcessing.classList.add('hidden');
+                            location.href = "/view-schedule/";
+                        }, delay);
                     })
                     .catch(error => {
                         aiProcessing.classList.add('hidden');
                         aiError.classList.remove('hidden');
+                        // Reset button state on error
+                        submitToAIButton.disabled = false;
+                        submitToAIButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                        document.getElementById('button-text').textContent = 'Optimize';
+
+                        // Restore original SVG on error
+                        submitToAIButton.replaceChild(buttonIcon, loadingSpinner);
+
                         console.error('Error processing AI:', error);
                     });
             });
@@ -189,6 +203,10 @@
             // Retry AI
             retryAIButton.addEventListener('click', () => {
                 aiError.classList.add('hidden');
+                // Reset button state before retrying
+                submitToAIButton.disabled = false;
+                submitToAIButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                document.getElementById('button-text').textContent = 'Optimize';
                 submitToAIButton.click();
             });
 
