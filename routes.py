@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, session, url_for, jsonify
+from flask import render_template, request, redirect, session, url_for, jsonify, flash
 from forms import LoginForm, RegisterForm, ActivityForm, ActivityListForm
 from config import app, db
 from helpers import login_required, toHash, hasNumber, hasSpecial, userId,loggedIn
@@ -21,21 +21,25 @@ def register():
     try:
         username = form.username.data
         password = form.password.data
-        confirm_password = form.confirm_password.data  # Corrected to fetch confirm_password from the form
+        confirm_password = form.confirm_password.data
     except:
-        return f"""Fields not filled"""
+        flash("All fields must be filled", "error")
+        return render_template("register.html", page="Register", form=form)
     
     if len(password) < 8 or not hasNumber(password) or not hasSpecial(password):
-        return f"""Pasword be at least 8 characters and have at least one number and special character"""
+        flash("Password must be at least 8 characters and have at least one number and special character", "error")
+        return render_template("register.html", page="Register", form=form)
     
     password = toHash(password)
-    confirm_password=toHash(confirm_password)
+    confirm_password = toHash(confirm_password)
 
     if password != confirm_password:
-        return f"""Passwords do not match"""
+        flash("Passwords do not match", "error")
+        return render_template("register.html", page="Register", form=form)
 
     if User.query.filter_by(username=username).first() is not None:
-        return f"""User exists"""
+        flash("Username already exists", "error")
+        return render_template("register.html", page="Register", form=form)
     
     user_id = str(genuuid())
 
@@ -43,6 +47,7 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
+    flash("Registration successful! Please log in.", "success")
     return redirect(url_for('log_in'))
 
 @app.route("/log-in/", methods=["GET", "POST"])
@@ -57,18 +62,21 @@ def log_in():
         username = form.username.data
         password = toHash(form.password.data)
     except:
-        return f"""Fields not filled"""
+        flash("All fields must be filled", "error")
+        return render_template("login.html", page="Log in", form=form)
     
     user = User.query.filter_by(username=username).first()
 
     if user is None:
-        return f"""Doesnt exist"""
+        flash("User does not exist", "error")
+        return render_template("login.html", page="Log in", form=form)
     
     if user.password == password:
         session["id"] = user.uuid
         return redirect(url_for('home'))
 
-    return f"""Password doesnt match"""
+    flash("Invalid password", "error")
+    return render_template("login.html", page="Log in", form=form)
 
 @app.route("/log-out/", methods=["GET"])
 @login_required
@@ -138,16 +146,17 @@ def create_schedule():
                 )
                 db.session.add(new_activity)
             db.session.commit()
-            return redirect(url_for('home'))  # Redirect to home after saving
+            flash("Schedule created successfully!", "success")
+            return redirect(url_for('home'))
         except Exception as e:
             db.session.rollback()
-            # Debugging: Log the error
-            print(f"Error saving activities: {str(e)}")
-            return f"An error occurred: {str(e)}", 500
+            flash(f"Error saving activities: {str(e)}", "error")
+            return render_template("schedule.html", page="Schedule", form=form)
 
-    # Debugging: Log form errors if validation fails
     if form.errors:
-        print(f"Form errors: {form.errors}")
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{field}: {error}", "error")
 
     return render_template("schedule.html", page="Schedule", form=form)
 

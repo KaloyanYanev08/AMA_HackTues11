@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="flex items-center justify-center">
+<div class="flex items-center justify-center w-full">
     <div class="card flex-shrink-0 w-full max-w-lg shadow-2xl bg-base-100 mt-15">
         <form method="POST" action="#" class="card-body">
             {{ form.hidden_tag() }}
@@ -16,11 +16,9 @@
                             {{ activity.details.label(class="label-text") }}
                             {{ activity.details(class="input input-bordered", id="activities-{{ loop.index0 }}-details") }}
                         </div>
-                        <div class="form-control">
+                        <div class="form-control flex justify-between">
                             {{ activity.start_time.label(class="label-text") }}
                             {{ activity.start_time(class="input input-bordered", id="activities-{{ loop.index0 }}-start_time") }}
-                        </div>
-                        <div class="form-control">
                             {{ activity.end_time.label(class="label-text") }}
                             {{ activity.end_time(class="input input-bordered", id="activities-{{ loop.index0 }}-end_time") }}
                         </div>

@@ -8,6 +8,37 @@
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
         <link href="https://cdn.jsdelivr.net/npm/daisyui@5/themes.css" rel="stylesheet" type="text/css" />
         <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css" />
+        <style>
+            @keyframes slideIn {
+                0% {
+                    transform: translateY(-100%);
+                    opacity: 0;
+                }
+                100% {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes slideOut {
+                0% {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(-100%);
+                    opacity: 0;
+                }
+            }
+
+            .alert-animate {
+                animation: slideIn 0.5s ease forwards;
+            }
+
+            .alert-animate.hide {
+                animation: slideOut 0.5s ease forwards;
+            }
+        </style>
     </head>
     <body class="bg-base-200 text-base-content min-h-screen flex flex-col">
         <div class="navbar bg-base-100 shadow-sm fixed top z-50 flex justify-start items-center" style="z-index: 50; position: fixed; width: calc(100% - 17px);">
@@ -81,6 +112,16 @@
                 drawerToggle.addEventListener('change', adjustNavbarWidth);
 
                 adjustNavbarWidth();
+
+                const alerts = document.querySelectorAll('.alert-animate');
+                alerts.forEach(alert => {
+                    setTimeout(() => {
+                        alert.classList.add('hide');
+                        setTimeout(() => {
+                            alert.remove();
+                        }, 500);
+                    }, 3500);
+                });
             });
         </script>
 
@@ -89,13 +130,28 @@
             <div class="drawer-side z-40">
                 <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
                 <ul class="menu bg-base-200 text-base-content min-h-full p-4 pt-20" style="width: 25vw; max-width: 300px; min-width: 200px;">
-                    <li><a>Sidebar Item 1</a></li>
-                    <li><a>Sidebar Item 2</a></li>
+                    <li><a href="{{ url_for('create_schedule') }}">Create schedule</a></li>
                 </ul>
             </div>
             <div class="drawer-content min-h-screen flex flex-col">
                 <div class="flex-grow">
                     <div class="pt-16">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert {{ 'alert-error' if category == 'error' else 'alert-success' }} w-96 mx-auto mt-4 alert-animate">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                                            {% if category == 'error' %}
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            {% else %}
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            {% endif %}
+                                        </svg>
+                                        <span>{{ message }}</span>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
                         {% block content %}
                         
                         {% endblock %}
