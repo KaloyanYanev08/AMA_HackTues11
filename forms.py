@@ -22,17 +22,15 @@ class ActivityForm(FlaskForm):
         ('Monday', 'Monday'), ('Tuesday', 'Tuesday'), ('Wednesday', 'Wednesday'),
         ('Thursday', 'Thursday'), ('Friday', 'Friday'), ('Saturday', 'Saturday'), ('Sunday', 'Sunday')
     ], validators=[DataRequired()])
-    date = DateField('Date', validators=[DataRequired()])
+
+class ActivityListForm(FlaskForm):
+    activities = FieldList(FormField(ActivityForm), min_entries=1)  # Allow adding multiple activities
+    add_more = SubmitField('+ Add More')
+    submit = SubmitField('Save Activities')
 
 class GoalForm(FlaskForm):
     details = StringField('Goal Details', validators=[DataRequired()])
     hour_goal = IntegerField('Hour Goal (Optional)')
     month = StringField('Month', validators=[DataRequired()])
     year = IntegerField('Year', validators=[DataRequired()])
-
-class ScheduleGoalsForm(FlaskForm):
-    activities = FieldList(FormField(ActivityForm), min_entries=1, max_entries=10)
-    goals = FieldList(FormField(GoalForm), min_entries=1, max_entries=5)
-    submit = SubmitField('Save Schedule and Goals')
-    add_more = SubmitField('+ Add More')
 

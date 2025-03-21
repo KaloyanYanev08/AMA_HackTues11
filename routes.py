@@ -1,6 +1,5 @@
 from flask import render_template, request, redirect, session, url_for, jsonify
-from forms import LoginForm, RegisterForm, ActivityForm, ScheduleGoalsForm
-from datetime import datetime
+from forms import LoginForm, RegisterForm, ActivityForm, ActivityListForm
 from config import app, db
 from helpers import login_required, toHash, hasNumber, hasSpecial, userId,loggedIn
 from models import User, Activity, MonthGoal
@@ -120,7 +119,7 @@ def schedule_goals():
 @app.route("/create_schedule/", methods=["GET", "POST"])
 @login_required
 def create_schedule():
-    form = ScheduleGoalsForm()
+    form = ActivityListForm()
 
     if form.add_more.data and request.method == "POST":  # Handle adding more activities
         form.activities.append_entry()
@@ -135,8 +134,7 @@ def create_schedule():
                     activity_details=activity["details"],
                     start_time=activity["start_time"],
                     end_time=activity["end_time"],
-                    day_of_week=activity["day_of_week"],
-                    date=activity["date"]
+                    day_of_week=activity["day_of_week"]
                 )
                 db.session.add(new_activity)
             db.session.commit()
