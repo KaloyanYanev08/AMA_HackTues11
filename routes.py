@@ -106,7 +106,7 @@ def create_schedule():
                     activity_details=activity["details"],
                     start_time=activity["start_time"],
                     end_time=activity["end_time"],
-                    day_of_week=activity["day_of_week"]
+                    day_of_week=request.form.get("day_tabs")
                 )
                 db.session.add(new_activity)
             db.session.commit()
@@ -122,7 +122,7 @@ def create_schedule():
             for error in errors:
                 flash(f"{field}: {error}", "error")
 
-    return render_template("schedule.html", page="Schedule", form=form)
+    return render_template("schedule.html", page="Create schedule", form=form)
 
 @app.route("/api/process-data/", methods=["POST"])
 @login_required
