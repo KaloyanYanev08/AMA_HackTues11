@@ -124,9 +124,14 @@
 
                 console.log(JSON.stringify({ schedule: currentSchedule, monthly_goals: goals }))
 
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
                 fetch('/api/process-data/', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
                     body: JSON.stringify({ schedule: currentSchedule, monthly_goals: goals })
                 })
                     .then(response => response.json())
