@@ -9,6 +9,12 @@ from datetime import datetime
 def home():
     if loggedIn():
         user_uuid = userId()
+        user = User.query.filter_by(uuid=user_uuid).first()
+        username = user.username if user else None
+        
+        today = datetime.now().strftime('%A')
+        
+        # Get weekly summary
         activities = Activity.query.filter_by(user_uuid=user_uuid).all()
         weekly_summary = {}
         for activity in activities:
@@ -16,8 +22,27 @@ def home():
                 weekly_summary[activity.activity_details] += calculate_time_diff(activity.start_time, activity.end_time)
             else:
                 weekly_summary[activity.activity_details] = calculate_time_diff(activity.start_time, activity.end_time)
+        
+        today_activities = Activity.query.filter_by(
+            user_uuid=user_uuid,
+            day_of_week=today
+        ).order_by(Activity.start_time).all()
+        
+        today_activities_list = []
+        for activity in today_activities:
+            today_activities_list.append({
+                'details': activity.activity_details,
+                'start_time': activity.start_time.strftime('%H:%M'),
+                'end_time': activity.end_time.strftime('%H:%M')
+            })
 
-        return render_template("stats.html", page="Home", weekly_summary=weekly_summary)
+        return render_template(
+            "stats.html",
+            page="Home",
+            username=username,
+            weekly_summary=weekly_summary,
+            today_activities=today_activities_list
+        )
     return render_template("home.html", page="Home")
 
 @app.route("/register/", methods=["GET", "POST"])
