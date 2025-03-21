@@ -4,19 +4,53 @@
     <div class="container mx-auto p-4">
         <h1 class="text-2xl font-bold mb-4">Current Schedule</h1>
         <div id="schedule-container" class="bg-white shadow-md rounded p-4 mb-4">
-            <!-- Schedule visualization will be dynamically populated here -->
+            <!-- Desktop View -->
+            <div class="hidden lg:block">
+                <div class="grid grid-cols-7 gap-4" id="schedule-grid">
+                    {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+                    {% for day in days %}
+                        <div class="bg-base-100 rounded-lg shadow-md">
+                            <h3 class="text-lg font-semibold text-center bg-primary text-white p-2 rounded-t-lg">{{ day }}</h3>
+                            <div id="{{ day | lower }}-activities" class="p-3 space-y-2 max-h-[calc(100vh-12rem)] overflow-y-auto">
+                                <!-- Activities will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Mobile View -->
+            <div class="block lg:hidden">
+                <div class="space-y-4">
+                    {% for day in days %}
+                        <div class="collapse bg-base-100 border-base-300 border rounded-lg">
+                            <input type="checkbox" />
+                            <div class="collapse-title font-semibold text-center bg-primary text-white rounded-t-lg">
+                                {{ day }}
+                            </div>
+                            <div class="collapse-content">
+                                <div id="{{ day | lower }}-activities-mobile" class="space-y-2 pt-3">
+                                    <!-- Activities will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
 
         <h2 class="text-xl font-bold mb-2">Monthly Goals</h2>
-        <div id="goals-container" class="bg-white shadow-md rounded p-4 mb-4">
+        <div id="goals-container" class="bg-white shadow-md rounded-xl p-4 mb-4">
             <form id="goals-form">
                 <div id="goal-fields">
-                    <!-- Goal input fields will be dynamically added here -->
                 </div>
             </form>
         </div>
 
-        <button id="submit-to-ai" class="btn btn-success">Optimize</button>
+        <button id="submit-to-ai" class=" bg-black btn-ghost btn btn-success text-primary-content">
+            <img src="{{ url_for('static', filename='weather-lightning-rounded-thunder-flash.svg') }}" alt="Logo" class="h-6 invert">
+            Optimize
+        </button>
 
         <div id="ai-processing" class="hidden mt-4">
             <div class="flex items-center">
@@ -59,19 +93,46 @@
 
             // Render schedule
             function renderSchedule(schedule) {
-                scheduleContainer.innerHTML = '';
-                Object.keys(schedule).forEach(day => {
-                    const dayDiv = document.createElement('div');
-                    dayDiv.classList.add('mb-2');
-                    dayDiv.innerHTML = `<strong>${day}</strong>:`
-                    schedule[day].forEach(activity => {
-                        dayDiv.innerHTML += `<br>${activity.details} (${activity.start_time}-${activity.end_time})`;
-                        scheduleContainer.appendChild(dayDiv);
-                    });
-                });
-                if(scheduleContainer.innerHTML == ''){
-                    document.href = "/create-schedule/";
+                if (Object.keys(schedule).length === 0) {
+                    window.location.href = "/create-schedule/";
+                    return;
                 }
+
+                const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                
+                // Update desktop view
+                days.forEach(day => {
+                    const activitiesDiv = document.getElementById(`${day.toLowerCase()}-activities`);
+                    const activitiesMobileDiv = document.getElementById(`${day.toLowerCase()}-activities-mobile`);
+                    
+                    // Clear existing activities
+                    activitiesDiv.innerHTML = '';
+                    activitiesMobileDiv.innerHTML = '';
+                    
+                    // Add activities if they exist for this day
+                    if (schedule[day]) {
+                        schedule[day].forEach(activity => {
+                            activitiesDiv.appendChild(createActivityCard(activity));
+                            activitiesMobileDiv.appendChild(createActivityCard(activity));
+                        });
+                    }
+                });
+            }
+
+            function createActivityCard(activity) {
+                const card = document.createElement('div');
+                card.classList.add('card', 'border', 'rounded-lg', 'p-3', 'hover:shadow-lg', 'transition-shadow', 'duration-200', 'cursor-pointer');
+                card.onclick = () => openBox(activity.details, activity.start_time, activity.end_time);
+                
+                card.innerHTML = `
+                    <h4 class="text-md font-semibold">${activity.details}</h4>
+                    <div class="text-sm mt-2">
+                        <p class="flex items-center"><span class="font-medium mr-2">Start:</span> ${activity.start_time}</p>
+                        <p class="flex items-center"><span class="font-medium mr-2">End:</span> ${activity.end_time}</p>
+                    </div>
+                `;
+                
+                return card;
             }
 
             // Render goals
@@ -131,11 +192,15 @@
                 submitToAIButton.click();
             });
 
-            // Cancel AI
             cancelAIButton.addEventListener('click', () => {
                 aiError.classList.add('hidden');
             });
         });
+
+        function openBox(details, startTime, endTime) {
+            // You can implement a modal or tooltip here if needed
+            console.log('Activity clicked:', details, startTime, endTime);
+        }
     </script>
 
 {% endblock %}
