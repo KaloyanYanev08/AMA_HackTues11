@@ -2,69 +2,71 @@
 
 {% block content %}
 <div class="bg-gray-100 py-10 px-4 text-center animate__animated animate__fadeIn animate__delay-1s">
-    <h1 class="text-5xl font-semibold mb-4">Welcome to Your Dashboard, (Username)</h1>
+    <h1 class="text-5xl font-bold">Welcome to Your Dashboard, (Username)</h1>
 </div>
 
 <div class="bg-gray-100 flex flex-col items-center py-10">
-    <div class="w-[80%] m-5 flex flex-col lg:flex-row gap-8">
+    <div class="w-[80%] flex flex-col lg:flex-row gap-8">
 
-        <div class="w-full lg:w-1/4 p-4 bg-white shadow-xl rounded-2xl flex items-center justify-center" style="aspect-ratio: 1; height: 200px;">
+        <!-- Pie Chart Box -->
+        <div class="w-full lg:w-1/4 p-4 bg-white shadow-xl rounded-2xl flex items-center justify-center" style="flex-grow: 1;">
             <canvas id="pieChart" class="rounded-lg w-full h-full"></canvas>
         </div>
 
-        <div class="w-full lg:w-3/4 p-6 bg-white shadow-xl rounded-2xl">
-            <h2 class="text-4xl font-bold text-center mb-4">Time Spent on Activities</h2>
+        <!-- Activities Box -->
+        <div class="w-full lg:w-3/4 p-6 bg-white shadow-xl rounded-2xl flex flex-col justify-start" style="flex-grow: 1;">
+            <h2 class="text-4xl font-bold text-center mb-4">Goals</h2>
 
-            <div class="collapse bg-gray-100 border-base-300 border relative">
-                <input type="checkbox" />
-                <div class="collapse-title font-semibold">Statistics</div>
+            <div class="space-y-4">
+                <div class="flex items-center">
+                    <div class="w-4 h-4 rounded-full bg-gradient-to-r from-[#FF2323] to-[#FF6D1F] mr-2"></div>
+                    <span>Activity 1</span>
+                    <div class="ml-auto w-24 rounded-full h-2.5 relative">
+                        <div class="bg-gradient-to-r from-[#FF2323] to-[#FF6D1F] h-full rounded-full" style="width: 60%"></div>
+                    </div>
+                </div>
 
-                <div class="collapse-content text-sm -mt-4">
-                    <div class="space-y-2">
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 rounded-full bg-gradient-to-r from-[#FF2323] to-[#FF6D1F] mr-2"></div>
-                            <span>Activity 1</span>
-                            <div class="ml-auto w-24 rounded-full h-2.5 relative">
-                                <div class="bg-gradient-to-r from-[#FF2323] to-[#FF6D1F] h-full rounded-full" style="width: 60%"></div>
-                            </div>
-                        </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 rounded-full bg-gradient-to-r from-[#FFB800] to-[#FF6D1F] mr-2"></div>
+                    <span>Activity 2</span>
+                    <div class="ml-auto w-24 bg-gray-100 rounded-full h-2.5 relative">
+                        <div class="bg-gradient-to-r from-[#FFB800] to-[#FF6D1F] h-full rounded-full" style="width: 80%"></div>
+                    </div>
+                </div>
 
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 rounded-full bg-gradient-to-r from-[#FFB800] to-[#FF6D1F] mr-2"></div>
-                            <span>Activity 2</span>
-                            <div class="ml-auto w-24 bg-gray-100 rounded-full h-2.5 relative">
-                                <div class="bg-gradient-to-r from-[#FFB800] to-[#FF6D1F] h-full rounded-full" style="width: 80%"></div>
-                            </div>
-                        </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 rounded-full bg-gradient-to-r from-[#FF6D1F] to-[#FFB800] mr-2"></div>
+                    <span>Activity 3</span>
+                    <div class="ml-auto w-24 bg-gray-100 rounded-full h-2.5 relative">
+                        <div class="bg-gradient-to-r from-[#FF6D1F] to-[#FFB800] h-full rounded-full" style="width: 40%"></div>
+                    </div>
+                </div>
 
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 rounded-full bg-gradient-to-r from-[#FF6D1F] to-[#FFB800] mr-2"></div>
-                            <span>Activity 3</span>
-                            <div class="ml-auto w-24 bg-gray-100 rounded-full h-2.5 relative">
-                                <div class="bg-gradient-to-r from-[#FF6D1F] to-[#FFB800] h-full rounded-full" style="width: 40%"></div>
-                            </div>
-                        </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 rounded-full bg-gradient-to-r from-[#FF4E00] to-[#FF9F00] mr-2"></div>
+                    <span>Activity 4</span>
+                    <div class="ml-auto w-24 bg-gray-100 rounded-full h-2.5 relative">
+                        <div class="bg-gradient-to-r from-[#FF4E00] to-[#FF9F00] h-full rounded-full" style="width: 75%"></div>
+                    </div>
+                </div>
 
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 rounded-full bg-gradient-to-r from-[#FF4E00] to-[#FF9F00] mr-2"></div>
-                            <span>Activity 4</span>
-                            <div class="ml-auto w-24 bg-gray-100 rounded-full h-2.5 relative">
-                                <div class="bg-gradient-to-r from-[#FF4E00] to-[#FF9F00] h-full rounded-full" style="width: 75%"></div>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 rounded-full bg-gradient-to-r from-[#7F00FF] to-[#9D00FF] mr-2"></div>
-                            <span>Activity 5</span>
-                            <div class="ml-auto w-24 bg-gray-100 rounded-full h-2.5 relative">
-                                <div class="bg-gradient-to-r from-[#7F00FF] to-[#9D00FF] h-full rounded-full" style="width: 90%"></div>
-                            </div>
-                        </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 rounded-full bg-gradient-to-r from-[#7F00FF] to-[#9D00FF] mr-2"></div>
+                    <span>Activity 5</span>
+                    <div class="ml-auto w-24 bg-gray-100 rounded-full h-2.5 relative">
+                        <div class="bg-gradient-to-r from-[#7F00FF] to-[#9D00FF] h-full rounded-full" style="width: 90%"></div>
                     </div>
                 </div>
             </div>
         </div>
 
+    </div>
+
+    <!-- New Div Below the Two Boxes -->
+    <div class="w-[80%] mt-10 p-6 bg-white shadow-xl rounded-2xl">
+        <p class="text-xl text-gray-700">
+            Text goes here
+        </p>
     </div>
 </div>
 
@@ -117,6 +119,7 @@
                     display: false
                 }
             },
+            maintainAspectRatio: false,  // This allows resizing dynamically based on container size
         }
     });
 </script>
