@@ -2,7 +2,7 @@ from flask import render_template, request, redirect, session, url_for, jsonify
 from forms import LoginForm, RegisterForm, ActivityForm, ScheduleGoalsForm
 from datetime import datetime
 from config import app, db
-from helpers import login_required, toHash, hasNumber, hasSpecial, userId
+from helpers import login_required, toHash, hasNumber, hasSpecial, userId,loggedIn
 from models import User, Activity, MonthGoal
 
 @app.route("/", methods=["GET"])
@@ -11,6 +11,8 @@ def home():
 
 @app.route("/register/", methods=["GET", "POST"])
 def register():
+    if loggedIn():
+        return redirect(url_for('home'))
     form=RegisterForm()
     if not request.method == "POST":
         return render_template("register.html", page="Register",form=form)
@@ -46,6 +48,8 @@ def register():
 
 @app.route("/log-in/", methods=["GET", "POST"])
 def log_in():
+    if loggedIn():
+        return redirect(url_for('home'))
     form=LoginForm()
     if not request.method == "POST":
         return render_template("login.html", page="Log in", form=form)
