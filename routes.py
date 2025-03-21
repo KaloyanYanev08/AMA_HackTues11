@@ -6,6 +6,8 @@ from models import User, Activity, MonthGoal
 
 @app.route("/", methods=["GET"])
 def home():
+    if loggedIn():
+        return render_template("stats.html", page="Home")
     return render_template("home.html", page="Home")
 
 @app.route("/register/", methods=["GET", "POST"])
@@ -133,11 +135,12 @@ def view_schedule():
     user_uuid = userId()
     days_of_the_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
-    schedule = {}
+    schedule = {day: [] for day in days_of_the_week}  # Initialize all days with empty lists
+    
+    # Add activities to the corresponding days
     for day in days_of_the_week:
         activities = Activity.query.filter_by(user_uuid=user_uuid, day_of_week=day).all()
         if activities:
-            schedule[day] = []
             for activity in activities:
                 schedule[day].append({
                     "details": activity.activity_details,

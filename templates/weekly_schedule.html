@@ -1,31 +1,48 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <div class="lg:hidden container mx-auto p-4">
-        <h1 class="text-2xl font-bold text-center my-4">Weekly Tracker</h1>
-        <div class="flex flex-row justify-center items-center">
-            <div class="flex flex-col justify-center items-center">
-                {% for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] %}
-                    <button class="day-button btn btn-primary w-32" data-day="{{ day }}">{{ day }}</button>
-                {% endfor %}
-            </div>
-            <div id="activities" class="flex-grow min-w-[60%]">
-                <!-- Activity cards will be displayed here dynamically -->
-            </div>
+<div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold text-center my-4">Weekly Schedule</h1>
+    
+    <div class="block lg:hidden">
+        <div class="space-y-4">
+            {% for day, activities in schedule.items() %}
+                <div class="collapse bg-base-100 border-base-300 border rounded-lg">
+                    <input type="checkbox" />
+                    <div class="collapse-title font-semibold text-center bg-primary text-white rounded-t-lg">
+                        {{ day }}
+                    </div>
+                    <div class="collapse-content">
+                        <div id="{{ day | lower }}-activities" class="space-y-2 pt-3">
+                            {% for activity in activities %}
+                                <div class="card border rounded-lg p-3 hover:shadow-lg transition-shadow duration-200">
+                                    <h4 class="text-md font-semibold">{{ activity.details }}</h4>
+                                    <div class="text-sm mt-2">
+                                        <p class="flex items-center"><span class="font-medium mr-2">Start:</span> {{ activity.start_time }}</p>
+                                        <p class="flex items-center"><span class="font-medium mr-2">End:</span> {{ activity.end_time }}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
     </div>
+
     <div class="hidden lg:block">
-        <h2 class="text-xl font-bold text-center my-4">Weekly Overview</h2>
         <div class="grid grid-cols-7 gap-4">
             {% for day, activities in schedule.items() %}
-                <div>
-                    <h3 class="text-lg font-semibold text-center">{{ day }}</h3>
-                    <div id="{{ day | lower }}-activities" class="activities-container">
+                <div class="bg-base-100 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-center bg-primary text-white p-2 rounded-t-lg">{{ day }}</h3>
+                    <div id="{{ day | lower }}-activities" class="p-3 space-y-2 max-h-[calc(100vh-12rem)] overflow-y-auto">
                         {% for activity in activities %}
-                            <div class="card border p-4 m-2">
-                                <h2 class="text-lg font-semibold">{{ activity.details }}</h2>
-                                <p><strong>Start:</strong> {{ activity.start_time }}</p>
-                                <p><strong>End:</strong> {{ activity.end_time }}</p>
+                            <div class="card border rounded-lg p-3 hover:shadow-lg transition-shadow duration-200">
+                                <h4 class="text-md font-semibold">{{ activity.details }}</h4>
+                                <div class="text-sm mt-2">
+                                    <p class="flex items-center"><span class="font-medium mr-2">Start:</span> {{ activity.start_time }}</p>
+                                    <p class="flex items-center"><span class="font-medium mr-2">End:</span> {{ activity.end_time }}</p>
+                                </div>
                             </div>
                         {% endfor %}
                     </div>
@@ -33,4 +50,5 @@
             {% endfor %}
         </div>
     </div>
+</div>
 {% endblock content %}
