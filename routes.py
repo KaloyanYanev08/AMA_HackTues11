@@ -101,6 +101,9 @@ def create_schedule():
         user_uuid = userId()
         try:
             for activity in form.activities.data:
+                if "sleep" not in activity["details"].lower() and activity["start_time"] >= activity["end_time"]:
+                    raise Exception("Start time must be less than end time")
+
                 new_activity = Activity(
                     user_uuid=user_uuid,
                     activity_details=activity["details"],
