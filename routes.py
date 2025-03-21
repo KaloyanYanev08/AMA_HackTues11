@@ -1,14 +1,23 @@
 from flask import render_template, request, redirect, session, url_for, jsonify, flash
 from forms import LoginForm, RegisterForm, ActivityForm, ActivityListForm
 from config import app, db
-from helpers import login_required, toHash, hasNumber, hasSpecial, userId,loggedIn
+from helpers import login_required, toHash, hasNumber, hasSpecial, userId, loggedIn, calculate_time_diff
 from models import User, Activity, MonthGoal
 from datetime import datetime
 
 @app.route("/", methods=["GET"])
 def home():
     if loggedIn():
-        return render_template("stats.html", page="Home")
+        user_uuid = userId()
+        activities = Activity.query.filter_by(user_uuid=user_uuid).all()
+        weekly_summary = {}
+        for activity in activities:
+            if activity.activity_details in weekly_summary:
+                weekly_summary[activity.activity_details] += calculate_time_diff(activity.start_time, activity.end_time)
+            else:
+                weekly_summary[activity.activity_details] = calculate_time_diff(activity.start_time, activity.end_time)
+
+        return render_template("stats.html", page="Home", weekly_summary=weekly_summary)
     return render_template("home.html", page="Home")
 
 @app.route("/register/", methods=["GET", "POST"])

@@ -35,3 +35,9 @@ def hasNumber(password):
 
 def hasSpecial(password):
     return bool(regex.search(r"[!@#$%^&*(),.?\":{}|<>]", password))
+
+def calculate_time_diff(start_time, end_time):
+    start = start_time.hour*60 + start_time.minute
+    end = end_time.hour*60 + end_time.minute
+    
+    return (end - start if end >= start else (24*60) - (start - end))/60
