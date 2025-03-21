@@ -258,7 +258,7 @@ def process_data():
     print(json)
 
     user_uuid = userId()
-    old_activities = Activity.query.filter_by(user_uuid=user_uuid).all().copy()
+    #old_activities = Activity.query.filter_by(user_uuid=user_uuid).all().copy()
     
     Activity.query.filter_by(user_uuid=user_uuid).delete()
     db.session.commit()
