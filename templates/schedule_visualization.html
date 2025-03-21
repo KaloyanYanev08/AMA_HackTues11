@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold mb-4">Current Schedule</h1>
+        <div id="schedule-container" class="bg-white shadow-md rounded p-4 mb-4">
+            <!-- Schedule visualization will be dynamically populated here -->
+        </div>
+
+        <h2 class="text-xl font-bold mb-2">Add Monthly Goals</h2>
+        <div id="goals-container" class="bg-white shadow-md rounded p-4 mb-4">
+            <form id="goals-form">
+                <div id="goal-fields">
+                    <!-- Goal input fields will be dynamically added here -->
+                </div>
+                <button type="button" id="add-goal" class="btn btn-primary mt-2">+ Add Goal</button>
+            </form>
+        </div>
+
+        <button id="submit-to-ai" class="btn btn-success">Submit to AI</button>
+
+        <div id="ai-processing" class="hidden mt-4">
+            <div class="flex items-center">
+                <div class="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-500"></div>
+                <span class="ml-2">Processing...</span>
+            </div>
+        </div>
+
+        <div id="ai-error" class="hidden mt-4 text-red-500">
+            <p>An error occurred while processing. Please try again.</p>
+            <button id="retry-ai" class="btn btn-warning">Try Again</button>
+            <button id="cancel-ai" class="btn btn-secondary">Cancel</button>
+        </div>
+
+        <div id="final-schedule" class="hidden mt-4">
+            <h2 class="text-xl font-bold mb-2">Final Schedule</h2>
+            <div id="final-schedule-container" class="bg-white shadow-md rounded p-4 mb-4">
+                <!-- Final schedule visualization will be dynamically populated here -->
+            </div>
+            <button id="save-changes" class="btn btn-success">Save Changes</button>
+            <button id="cancel-changes" class="btn btn-secondary">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const scheduleContainer = document.getElementById('schedule-container');
+            const goalsContainer = document.getElementById('goal-fields');
+            const addGoalButton = document.getElementById('add-goal');
+            const submitToAIButton = document.getElementById('submit-to-ai');
+            const aiProcessing = document.getElementById('ai-processing');
+            const aiError = document.getElementById('ai-error');
+            const retryAIButton = document.getElementById('retry-ai');
+            const cancelAIButton = document.getElementById('cancel-ai');
+            const finalSchedule = document.getElementById('final-schedule');
+            const finalScheduleContainer = document.getElementById('final-schedule-container');
+            const saveChangesButton = document.getElementById('save-changes');
+            const cancelChangesButton = document.getElementById('cancel-changes');
+
+            let currentSchedule = [];
+            let monthlyGoals = [];
+
+            // Fetch current schedule and populate
+            fetch('/api/get-schedule')
+                .then(response => response.json())
+                .then(data => {
+                    currentSchedule = data.schedule;
+                    monthlyGoals = data.goals;
+                    renderSchedule(currentSchedule);
+                    renderGoals(monthlyGoals);
+                })
+                .catch(error => console.error('Error fetching schedule:', error));
+
+            // Render schedule
+            function renderSchedule(schedule) {
+                scheduleContainer.innerHTML = '';
+                const days_of_the_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+                days_of_the_week.forEach(days => {
+                    const dayDiv = document.createElement('div');
+                    dayDiv.classList.add('mb-2');
+                    dayDiv.innerHTML = `<strong>${days}</strong>:`
+                    schedule[days].forEach(day => {
+                        dayDiv.innerHTML += `<br>${day.details} (${day.start_time}-${day.end_time})`;
+                        scheduleContainer.appendChild(dayDiv);
+                    });
+                });
+            }
+
+            // Render goals
+            function renderGoals(goals) {
+                goalsContainer.innerHTML = '';
+                goals.forEach((goal, index) => {
+                    const goalDiv = document.createElement('div');
+                    goalDiv.classList.add('mb-2');
+                    goalDiv.innerHTML = `
+                        <input type="text" name="goal-details-${index}" value="${goal.details}" placeholder="Goal Details" class="input input-bordered w-full mb-2">
+                        <input type="number" name="goal-hours-${index}" value="${goal.hour_goal || ''}" placeholder="Hour Goal (Optional)" class="input input-bordered w-full">
+                    `;
+                    goalsContainer.appendChild(goalDiv);
+                });
+            }
+
+            // Add new goal field
+            addGoalButton.addEventListener('click', () => {
+                const goalDiv = document.createElement('div');
+                goalDiv.classList.add('mb-2');
+                goalDiv.innerHTML = `
+                    <input type="text" name="goal-details" placeholder="Goal Details" class="input input-bordered w-full mb-2">
+                    <input type="number" name="goal-hours" placeholder="Hour Goal (Optional)" class="input input-bordered w-full">
+                `;
+                goalsContainer.appendChild(goalDiv);
+            });
+
+            // Submit to AI
+            submitToAIButton.addEventListener('click', () => {
+                aiProcessing.classList.remove('hidden');
+                aiError.classList.add('hidden');
+                finalSchedule.classList.add('hidden');
+
+                const goals = Array.from(goalsContainer.querySelectorAll('input[name="goal-details"]')).map((input, index) => ({
+                    details: input.value,
+                    hour_goal: goalsContainer.querySelector(`input[name="goal-hours-${index}"]`)?.value || null
+                }));
+
+                console.log(JSON.stringify({ schedule: currentSchedule, monthly_goals: goals }))
+
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                fetch('/api/process-data/', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ schedule: currentSchedule, monthly_goals: goals })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        aiProcessing.classList.add('hidden');
+                        if (data.error) throw new Error(data.error);
+                        renderFinalSchedule(data);
+                    })
+                    .catch(error => {
+                        aiProcessing.classList.add('hidden');
+                        aiError.classList.remove('hidden');
+                        console.error('Error processing AI:', error);
+                    });
+            });
+
+            // Retry AI
+            retryAIButton.addEventListener('click', () => {
+                aiError.classList.add('hidden');
+                submitToAIButton.click();
+            });
+
+            // Cancel AI
+            cancelAIButton.addEventListener('click', () => {
+                aiError.classList.add('hidden');
+            });
+
+            // Render final schedule
+            function renderFinalSchedule(data) {
+                finalSchedule.classList.remove('hidden');
+                finalScheduleContainer.innerHTML = '';
+                Object.keys(data).forEach(day => {
+                    const dayDiv = document.createElement('div');
+                    dayDiv.classList.add('mb-2');
+                    dayDiv.innerHTML = `<strong>${day}</strong>: ${data[day].map(a => `${a.details} (${a.start_time} - ${a.end_time})`).join(', ')}`;
+                    finalScheduleContainer.appendChild(dayDiv);
+                });
+            }
+
+            // Save changes
+            saveChangesButton.addEventListener('click', () => {
+                fetch('/api/save-schedule', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ schedule: currentSchedule })
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Failed to save schedule');
+                        alert('Schedule saved successfully!');
+                        location.reload();
+                    })
+                    .catch(error => console.error('Error saving schedule:', error));
+            });
+
+            // Cancel changes
+            cancelChangesButton.addEventListener('click', () => {
+                finalSchedule.classList.add('hidden');
+            });
+        });
+    </script>
+
+{% endblock %}

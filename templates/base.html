@@ -39,6 +39,7 @@
                 animation: slideOut 0.5s ease forwards;
             }
         </style>
+        <meta name="csrf-token" content="{{ csrf_token() }}">
     </head>
     <body class="bg-base-200 text-base-content min-h-screen flex flex-col">
         <div class="navbar bg-base-100 shadow-sm fixed top z-50 flex justify-start items-center" style="z-index: 50; position: fixed; width: calc(100% - 17px);">
