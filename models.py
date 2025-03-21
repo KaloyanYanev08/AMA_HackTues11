@@ -1,4 +1,5 @@
 from config import db
+from datetime import datetime, timezone
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -14,7 +15,7 @@ class Activity(db.Model):
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
     day_of_week = db.Column(db.String, nullable=False)
-    date=db.Column(db.Date, nullable=False)
+    date=db.Column(db.DateTime, nullable=False, default=datetime.now(timezone.utc))
 
 class MonthGoal(db.Model):
     __tablename__ = 'month_goals'

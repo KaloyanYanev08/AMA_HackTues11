@@ -1,51 +1,115 @@
-{% extends 'base.html' %}
+<div class="bg-gray-100 flex flex-col items-center py-10">
+    <div class="w-[80%] m-[5%] flex flex-col lg:flex-row gap-8">
 
-{% block content %}
-<div class="min-h-screen bg-gray-100 flex flex-col items-center py-10">
-    <div class="m-[5%] size-5/8 flex flex-col lg:flex-row lg:justify-around gap-8">
-        <div class="w-full lg:w-2/3 p-6 bg-white shadow-xl rounded-2xl">
-            <h2 class="text-4xl font-bold mb-6 text-center">Time Spent on Activities</h2>
-            <canvas id="pieChart" class="rounded-lg"></canvas>
+        <div class="w-full lg:w-1/4 p-4 bg-white shadow-xl rounded-2xl flex items-center justify-center" style="aspect-ratio: 1; height: 200px;">
+            <canvas id="pieChart" class="rounded-lg w-full h-full"></canvas>
         </div>
-        <div class="w-full lg:w-2/3 p-6 bg-white shadow-xl rounded-2xl">
-            <h2 class="text-4xl font-bold mb-6 text-center">Goal Progress</h2>
-            <div class="mb-6">
-                <label class="block text-lg font-semibold text-gray-700">Goal 1</label>
-                <div class="w-full bg-gray-200 rounded-full h-6">
-                    <div class="bg-red-600 text-sm font-medium text-red-100 text-center p-1 leading-none rounded-full" style="width: 70%">70%</div>
-                </div>
-            </div>
-            <div class="mb-6">
-                <label class="block text-lg font-semibold text-gray-700">Goal 2</label>
-                <div class="w-full bg-gray-200 rounded-full h-6">
-                    <div class="bg-yellow-600 text-sm font-medium text-yellow-100 text-center p-1 leading-none rounded-full" style="width: 50%">50%</div>
-                </div>
-            </div>
-            <div class="mb-6">
-                <label class="block text-lg font-semibold text-gray-700">Goal 3</label>
-                <div class="w-full bg-gray-200 rounded-full h-6">
-                    <div class="bg-green-600 text-sm font-medium text-green-100 text-center p-1 leading-none rounded-full" style="width: 30%">30%</div>
+
+        <div class="w-full lg:w-3/4 p-6 bg-white shadow-xl rounded-2xl">
+            <h2 class="text-4xl font-bold text-center mb-4">Time Spent on Activities</h2>
+
+            <div class="collapse bg-base-100 border-base-300 border relative">
+                <input type="checkbox" />
+                <div class="collapse-title font-semibold">How do I create an account?</div>
+
+                <div class="collapse-content text-sm -mt-4">
+                    <div class="space-y-2">
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 rounded-full bg-gradient-to-r from-[#FF2323] to-[#FF6D1F] mr-2"></div>
+                            <span>Activity 1</span>
+                            <div class="ml-auto w-24 bg-gray-200 rounded-full h-2.5 relative">
+                                <div class="bg-gradient-to-r from-[#FF2323] to-[#FF6D1F] h-full rounded-full" style="width: 60%"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 rounded-full bg-gradient-to-r from-[#FFB800] to-[#FF6D1F] mr-2"></div>
+                            <span>Activity 2</span>
+                            <div class="ml-auto w-24 bg-gray-200 rounded-full h-2.5 relative">
+                                <div class="bg-gradient-to-r from-[#FFB800] to-[#FF6D1F] h-full rounded-full" style="width: 80%"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 rounded-full bg-gradient-to-r from-[#FF6D1F] to-[#FFB800] mr-2"></div>
+                            <span>Activity 3</span>
+                            <div class="ml-auto w-24 bg-gray-200 rounded-full h-2.5 relative">
+                                <div class="bg-gradient-to-r from-[#FF6D1F] to-[#FFB800] h-full rounded-full" style="width: 40%"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 rounded-full bg-gradient-to-r from-[#FF4E00] to-[#FF9F00] mr-2"></div>
+                            <span>Activity 4</span>
+                            <div class="ml-auto w-24 bg-gray-200 rounded-full h-2.5 relative">
+                                <div class="bg-gradient-to-r from-[#FF4E00] to-[#FF9F00] h-full rounded-full" style="width: 75%"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 rounded-full bg-gradient-to-r from-[#7F00FF] to-[#9D00FF] mr-2"></div>
+                            <span>Activity 5</span>
+                            <div class="ml-auto w-24 bg-gray-200 rounded-full h-2.5 relative">
+                                <div class="bg-gradient-to-r from-[#7F00FF] to-[#9D00FF] h-full rounded-full" style="width: 90%"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const ctx = document.getElementById('pieChart').getContext('2d');
+
+    const gradients = [
+        ctx.createLinearGradient(0, 0, 0, 400),
+        ctx.createLinearGradient(0, 0, 0, 400),
+        ctx.createLinearGradient(0, 0, 0, 400),
+        ctx.createLinearGradient(0, 0, 0, 400),
+        ctx.createLinearGradient(0, 0, 0, 400)
+    ];
+
+    const colorPairs = [
+        ['#FF2323', '#FF6D1F'], // Fiery Red to Orange
+        ['#FFB800', '#FF6D1F'], // Bright Yellow to Orange
+        ['#FF6D1F', '#FFB800'], // Orange to Bright Yellow
+        ['#FF4E00', '#FF9F00'], // Red to Yellow
+        ['#7F00FF', '#9D00FF']  // Purple gradient
+    ];
+
+    const selectedGradients = gradients.slice(0, 5);
+    const selectedLabels = ['Activity 1', 'Activity 2', 'Activity 3', 'Activity 4', 'Activity 5'];
+
+    selectedGradients.forEach((gradient, index) => {
+        gradient.addColorStop(0, colorPairs[index][0]);
+        gradient.addColorStop(1, colorPairs[index][1]);
+    });
+
     const pieChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['Activity 1', 'Activity 2', 'Activity 3'],
+            labels: selectedLabels,
             datasets: [{
-                data: [10, 20, 30],
-                backgroundColor: ['#DC2626', '#FBBF24', '#10B981'],
+                data: [10, 20, 30, 25, 15], 
+                backgroundColor: selectedGradients, 
+                borderWidth: 2,
+                borderColor: '#ffffff',
+                borderRadius: 10,
+                spacing: 5
             }]
         },
         options: {
             responsive: true,
+            cutout: '85%',
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
         }
     });
 </script>
-{% endblock %}
