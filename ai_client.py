@@ -13,6 +13,6 @@ def send_to_model(prompt):
             messages=[{'role': 'user', 'content': prompt}],
             stream=False
         )
-        return jsonify(response)
+        return jsonify(dict(response))
     except Exception as e:
         return jsonify({"error": str(e)}), 500
