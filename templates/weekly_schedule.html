@@ -1,5 +1,19 @@
 {% extends 'base.html' %}
 
+{% macro render_field(field, class_="", id="") %}
+    <div class="form-group">
+        {{ field.label(class_="form-label") }}
+        {{ field(class_=class_, id=id) }}
+        {% if field.errors %}
+            <ul class="form-errors">
+                {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endmacro %}
+
 {% block content %}
 <div class="container mx-auto p-4 pb-12">
     <h1 class="text-2xl font-bold text-center my-4">Weekly Schedule</h1>
@@ -16,7 +30,7 @@
                     <div class="collapse-content">
                         <div id="{{ day | lower }}-activities" class="space-y-2 pt-3">
                             {% for activity in activities %}
-                                <div class="card border rounded-lg p-3 hover:shadow-lg transition-shadow duration-200 cursor-pointer" onclick="openBox('{{ activity.details }}', '{{ activity.start_time }}', '{{ activity.end_time }}')">
+                                <div class="card border rounded-lg p-3 hover:shadow-lg transition-shadow duration-200 cursor-pointer" onclick="openBox('{{ activity.id }}', '{{ activity.details }}', '{{ activity.start_time }}', '{{ activity.end_time }}', '{{ day }}')">
                                     <h4 class="text-md font-semibold">{{ activity.details }}</h4>
                                     <div class="text-sm mt-2">
                                         <p class="flex items-center"><span class="font-medium mr-2">Start:</span> {{ activity.start_time }}</p>
@@ -38,7 +52,7 @@
                     <h3 class="text-lg font-semibold text-center bg-primary text-white p-2 rounded-t-lg">{{ day }}</h3>
                     <div id="{{ day | lower }}-activities" class="p-3 space-y-2 max-h-[calc(100vh-12rem)] overflow-y-auto">
                         {% for activity in activities %}
-                            <div class="card border rounded-lg p-3 hover:shadow-lg transition-shadow duration-200 cursor-pointer" onclick="openBox('{{ activity.details }}', '{{ activity.start_time }}', '{{ activity.end_time }}')">
+                            <div class="card border rounded-lg p-3 hover:shadow-lg transition-shadow duration-200 cursor-pointer" onclick="openBox('{{ activity.id }}', '{{ activity.details }}', '{{ activity.start_time }}', '{{ activity.end_time }}', '{{ day }}')">
                                 <h4 class="text-md font-semibold">{{ activity.details }}</h4>
                                 <div class="text-sm mt-2">
                                     <p class="flex items-center"><span class="font-medium mr-2">Start:</span> {{ activity.start_time }}</p>
@@ -59,23 +73,26 @@
 <div id="activity-box" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white shadow-lg rounded-lg p-8 hidden w-[90%] md:w-[50%] lg:w-[40%] max-w-[600px] z-50">
         <div class="card-body p-0">
             <h3 class="text-2xl font-bold text-center mb-6 text-primary">Edit Schedule</h3>
-            <form method="POST" action="/edit-schedule">
+            <form method="POST" action="/view-schedule/">
+                {{ form.hidden_tag() }} <!-- CSRF token for security -->
+                <input type="hidden" id="activity-id" name="id" value=""> <!-- Hidden field for activity ID -->
+                <input type="hidden" id="activity-day" name="day" value="">
                 <div class="bg-white font-semibold">
                     <div class="bg-base-100 border-base-300">
                         <div class="flex form-control mb-4 justify-center w-full">
                             <div class="flex-col w-full">
                                 <label class="label-text text-lg font-semibold w-full">Activity</label>
-                                <input type="text" id="box-title" name="activity" class="input input-bordered text-base w-full" value="Testing" />
+                                {{ render_field(form.details, id="activity-details", class_="input input-bordered text-base w-full") }}
                             </div>
                         </div>
                         <div class="form-control mb-4 flex flex-col sm:flex-row gap-4 justify-between">
                             <div class="w-full sm:w-1/2">
                                 <label class="label-text text-lg font-semibold">Start Time</label>
-                                <input type="time" id="box-start" name="start" class="input input-bordered text-base w-full" value="09:00" />
+                                {{ render_field(form.start_time, id="activity-start", class_="input input-bordered text-base w-full") }}
                             </div>
                             <div class="w-full sm:w-1/2">
                                 <label class="label-text text-lg font-semibold">End Time</label>
-                                <input type="time" id="box-end" name="end" class="input input-bordered text-base w-full" value="10:00" />
+                                {{ render_field(form.end_time, id="activity-end", class_="input input-bordered text-base w-full") }}
                             </div>
                         </div>
                         <div class="modal-action mt-6 flex gap-2 justify-end">
@@ -89,10 +106,12 @@
 </div>
 
 <script>
-    function openBox(details, start, end) {
-        document.getElementById('box-title').value = details;
-        document.getElementById('box-start').value = start;
-        document.getElementById('box-end').value = end;
+    function openBox(id, details, start, end, day) {
+        document.getElementById('activity-id').value = id;
+        document.getElementById('activity-details').value = details;
+        document.getElementById('activity-start').value = start;
+        document.getElementById('activity-end').value = end;
+        document.getElementById('activity-day').value = day;
         document.getElementById('activity-box').classList.remove('hidden');
         document.getElementById('overlay').classList.remove('hidden');
     }
