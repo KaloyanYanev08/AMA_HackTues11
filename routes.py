@@ -426,3 +426,22 @@ def view_goals():
     user_uuid = userId()
     goals = MonthGoal.query.filter_by(user_uuid=user_uuid).all()
     return render_template("view_goals.html", page="View Goals", goals=goals)
+
+@app.route("/delete-activity/<int:activity_id>", methods=["POST"])
+@login_required
+def delete_activity(activity_id):
+    user_uuid = userId()
+    try:
+        activity = Activity.query.filter_by(id=activity_id, user_uuid=user_uuid).first()
+        if not activity:
+            app.logger.error(f"Activity with ID {activity_id} not found or unauthorized.")
+            return jsonify({"error": "Activity not found or unauthorized."}), 404
+
+        db.session.delete(activity)
+        db.session.commit()
+        app.logger.info(f"Activity with ID {activity_id} deleted successfully.")
+        return redirect(url_for("view_schedule"))
+    except Exception as e:
+        app.logger.error(f"Error occurred while deleting activity: {str(e)}")
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500

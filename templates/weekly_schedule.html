@@ -32,8 +32,14 @@
                         <div class="collapse-content">
                             <div id="{{ day | lower }}-activities" class="space-y-2 pt-3">
                                 {% for activity in activities %}
-                                    <div class="card border rounded-lg p-3 hover:shadow-lg transition-shadow duration-200 {{ 'bg-warning' if activity.is_optimized else '' }}" onclick="openBox('{{ activity.id }}', '{{ activity.details }}', '{{ activity.start_time }}', '{{ activity.end_time }}', '{{ day }}')">
-                                        <h4 class="text-md font-semibold">{{ activity.details }}</h4>
+                                    <div class="card border rounded-lg p-3 hover:shadow-lg transition-shadow duration-200 {{ 'bg-warning' if activity.is_optimized else '' }}">
+                                        <div class="flex justify-between items-center">
+                                            <h4 class="text-md font-semibold cursor-pointer" onclick="openBox('{{ activity.id }}', '{{ activity.details }}', '{{ activity.start_time }}', '{{ activity.end_time }}', '{{ day }}')">{{ activity.details }}</h4>
+                                            <form method="POST" action="{{ url_for('delete_activity', activity_id=activity.id) }}" class="inline mt-4">
+                                                {{ form.hidden_tag() }}
+                                                <small><button type="submit" class="text-red-500 font-bold bg-white border-none p-0 m-0" style="background-color: white; border: none; color: rgb(199, 33, 33); font-size: 1.5rem; line-height: 1; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;" >X</button></small>
+                                            </form>
+                                        </div>
                                         <div class="text-sm mt-2">
                                             <p class="flex items-center"><span class="font-medium mr-2">Start:</span> {{ activity.start_time }}</p>
                                             <p class="flex items-center"><span class="font-medium mr-2">End:</span> {{ activity.end_time }}</p>
@@ -54,8 +60,14 @@
                         <h3 class="text-lg font-semibold text-center bg-primary text-white p-2 rounded-t-lg">{{ day }}</h3>
                         <div id="{{ day | lower }}-activities" class="p-3 space-y-2 max-h-[calc(100vh-12rem)] overflow-y-auto">
                             {% for activity in activities %}
-                                <div class="card border rounded-lg p-3 hover:shadow-lg transition-shadow duration-200 cursor-pointer" onclick="openBox('{{ activity.id }}', '{{ activity.details }}', '{{ activity.start_time }}', '{{ activity.end_time }}', '{{ day }}')">
-                                    <h4 class="text-md font-semibold">{{ activity.details }}</h4>
+                                <div class="card border rounded-lg p-3 hover:shadow-lg transition-shadow duration-200 {{ 'bg-warning' if activity.is_optimized else '' }}">
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="text-md font-semibold cursor-pointer" onclick="openBox('{{ activity.id }}', '{{ activity.details }}', '{{ activity.start_time }}', '{{ activity.end_time }}', '{{ day }}')">{{ activity.details }}</h4>
+                                        <form method="POST" action="{{ url_for('delete_activity', activity_id=activity.id) }}" class="inline mt-4">
+                                            {{ form.hidden_tag() }}
+                                        <small>    <button type="submit" class="text-red-500 font-bold bg-white border-none p-0 m-0" style="background-color: white; border: none; color: rgb(199, 33, 33); font-size: 1.5rem; line-height: 1; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;" >X</button></small>
+                                        </form>
+                                    </div>
                                     <div class="text-sm mt-2">
                                         <p class="flex items-center"><span class="font-medium mr-2">Start:</span> {{ activity.start_time }}</p>
                                         <p class="flex items-center"><span class="font-medium mr-2">End:</span> {{ activity.end_time }}</p>
@@ -132,6 +144,7 @@
         document.getElementById('activity-box').classList.add('hidden');
         document.getElementById('overlay').classList.add('hidden');
     }
+
 
 </script>
 
