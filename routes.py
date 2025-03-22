@@ -440,6 +440,7 @@ def delete_activity(activity_id):
         db.session.delete(activity)
         db.session.commit()
         app.logger.info(f"Activity with ID {activity_id} deleted successfully.")
+        flash("Activity deleted successfully!", "success")
         return redirect(url_for("view_schedule"))
     except Exception as e:
         app.logger.error(f"Error occurred while deleting activity: {str(e)}")
