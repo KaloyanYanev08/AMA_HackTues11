@@ -185,7 +185,7 @@
                         'Content-Type': 'application/json',
                         'X-CSRFToken': csrfToken
                     },
-                    body: JSON.stringify({ schedule: currentSchedule, monthly_goals: goals })
+                    body: JSON.stringify({ schedule: currentSchedule, monthly_goals: monthlyGoals })
                 })
                     .then(data => {
                         const delay = Math.floor(Math.random() * (5000 - 3000 + 1)) + 3000;

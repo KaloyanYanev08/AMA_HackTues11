@@ -92,6 +92,8 @@
                         <div class="flex-col w-full">
                             <label class="label-text text-lg font-semibold w-full">Activity</label>
                             {{ render_field(form.details, id="activity-details", class_="input input-bordered text-base w-full") }}
+
+       
                         </div>
                     </div>
                     <div class="form-control mb-4 flex flex-col sm:flex-row gap-4 justify-between">
@@ -130,6 +132,7 @@
         document.getElementById('activity-box').classList.add('hidden');
         document.getElementById('overlay').classList.add('hidden');
     }
+
 </script>
 
 {% endblock content %}

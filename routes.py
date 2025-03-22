@@ -403,6 +403,23 @@ def delete_goal(goal_id):
     flash("Goal deleted successfully!", "success")
     return redirect(url_for("view_goals"))
 
+@app.route("/delete-goal/<int:goal_id>", methods=["DELETE"])
+@login_required
+def delete_goal_api(goal_id):
+    user_uuid = userId()
+    goal = MonthGoal.query.filter_by(id=goal_id, user_uuid=user_uuid).first()
+
+    if not goal:
+        return jsonify({"error": "Goal not found or unauthorized."}), 404
+
+    try:
+        db.session.delete(goal)
+        db.session.commit()
+        return jsonify({"message": "Goal deleted successfully."}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
 @app.route("/view-goals/", methods=["GET"])
 @login_required
 def view_goals():
