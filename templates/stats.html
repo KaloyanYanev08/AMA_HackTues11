@@ -16,7 +16,7 @@
         <!-- Pie Chart Card -->
         <div class="card bg-base-100 shadow-xl backdrop-blur-sm bg-opacity-80">
             <div class="card-body">
-                <h2 class="card-title text-xl sm:text-2xl font-bold text-center mb-4 text-primary">Weekly Activities</h2>
+                <h2 class="card-title text-xl sm:text-2xl font-bold text-center mb-4 text-primary"><a href="{{ url_for('view_schedule') }}">Weekly Activities</a></h2>
                 <div class="aspect-square relative">
                     <canvas id="pieChart" class="rounded-lg"></canvas>
                 </div>
@@ -27,23 +27,15 @@
         <div class="card bg-base-100 shadow-xl backdrop-blur-sm bg-opacity-80 lg:col-span-3">
             <div class="card-body">
                 <h2 class="card-title text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 text-primary">
-                    Today's Activities
+                    <a href="{{ url_for('view_schedule') }}">
+                        Today's Activities
+                    </a>
                     <span class="text-lg sm:text-xl md:text-2xl opacity-75" id="currentDate"></span>
                 </h2>
                 <div class="space-y-4" id="activitiesContainer">
                     <!-- Activities will be populated by JavaScript -->
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Summary Card -->
-    <div class="card bg-base-100 shadow-xl mt-8 backdrop-blur-sm bg-opacity-80">
-        <div class="card-body prose max-w-none">
-            <h2 class="card-title text-primary">Summary</h2>
-            <p class="text-xl opacity-80">
-                
-            </p>
         </div>
     </div>
 </div>

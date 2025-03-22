@@ -133,10 +133,15 @@
             <input id="my-drawer" type="checkbox" class="drawer-toggle" />
             <div class="drawer-side z-40">
                 <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-                <ul class="menu bg-base-200 text-base-content min-h-full p-4 pt-20" style="width: 25vw; max-width: 300px; min-width: 200px;">
-                    <li><a href="{{ url_for('create_schedule') }}">Create schedule</a></li>
+                <ul class="menu bg-base-200 text-base-content min-h-full p-4 pt-20 font-3xl" style="width: 25vw; max-width: 300px; min-width: 200px;">
+                    <div class="divider"></div>
                     <li><a href="{{ url_for('view_schedule') }}">View schedule</a></li>
-                    <li><a href="{{ url_for('generate_schedule') }}">Generate schedule with AI</a></li>
+                    <li><a href="{{ url_for('create_schedule') }}">Add to schedule</a></li>
+                    <li><a href="{{ url_for('generate_schedule') }}">Generate schedule</a></li>
+                    <div class="divider"></div>
+                    <li><a href="{{ url_for('view_goals') }}">View goals</a></li>
+                    <li><a href="{{ url_for('add_goal') }}">Add a goal</a></li>
+                    <div class="divider"></div>
                 </ul>
             </div>
             <div class="drawer-content min-h-screen flex flex-col">

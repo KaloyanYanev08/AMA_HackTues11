@@ -132,19 +132,29 @@
 
             // Render goals
             function renderGoals(goals) {
-                goalsContainer.innerHTML = '';
-                goals.forEach((goal, index) => {
-                    const goalDiv = document.createElement('div');
-                    goalDiv.classList.add('mb-2');
-                    goalDiv.innerHTML = `
-                        <p>${goal.details} - ${goal.hour_goal || 'Unspecified'} hours</p>
-                    `;
-                    goalsContainer.appendChild(goalDiv);
-                });
-                if(goalsContainer.innerHTML == '') {
-                    goalsContainer.innerHTML = 'You dont have any goals yet.'
+                goalsContainer.innerHTML = '';  // Clear any existing content
+
+                if (goals.length === 0) {
+                    goalsContainer.innerHTML = 'You don’t have any goals yet.';
+                    return;
                 }
+
+                goals.forEach((goal, index) => {
+                    // Create the card container
+                    const goalCard = document.createElement('div');
+                    goalCard.classList.add('card', 'bg-base-100', 'shadow-md', 'rounded-lg', 'p-4', 'mb-4', 'hover:shadow-xl', 'transition-shadow', 'duration-300');
+
+                    // Create card content
+                    goalCard.innerHTML = `
+                        <h3 class="text-lg font-semibold mb-2">${goal.details}</h3>
+                        <p class="text-sm text-gray-500">Goal: ${goal.hour_goal || 'Unspecified'} hours</p>
+                    `;
+
+                    // Append the goal card to the container
+                    goalsContainer.appendChild(goalCard);
+                });
             }
+
 
             // Submit to AI
             submitToAIButton.addEventListener('click', () => {

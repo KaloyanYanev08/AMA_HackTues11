@@ -1,40 +1,40 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4">Edit Goal</h1>
-    <form method="POST" class="space-y-4">
+<div class="container mx-auto p-6 max-w-md bg-base-100 rounded-lg shadow-md mt-15">
+    <h1 class="text-2xl font-bold mb-6 text-center text-primary">Edit Goal</h1>
+    <form method="POST" class="space-y-6">
         {{ form.hidden_tag() }}
         <div class="form-control">
-            {{ form.details.label(class="label-text") }}
+            {{ form.details.label(class="label-text font-semibold text-lg") }}
             {% if form.details.errors %}
-                {{ form.details(class="input input-bordered is-invalid", value=goal.goal_details ) }}
-                <div class="invalid-feedback">
+                {{ form.details(class="input input-bordered input-error w-full", value=goal.goal_details ) }}
+                <div class="invalid-feedback text-red-500 mt-2">
                     {% for error in form.details.errors %}
                         <span>{{ error }}</span>
                     {% endfor %}
                 </div>
             {% else %}
-                {{ form.details(class="input input-bordered", value=goal.goal_details ) }}
+                {{ form.details(class="input input-bordered w-full", value=goal.goal_details ) }}
             {% endif %}
         </div>
         <div class="form-control">
-            {{ form.hour_goal.label(class="label-text") }}
+            {{ form.hour_goal.label(class="label-text font-semibold text-lg") }}
             {% if form.hour_goal.errors %}
-                {{ form.hour_goal(class="input input-bordered is-invalid", value=goal.hour_goal ) }}
-                <div class="invalid-feedback">
+                {{ form.hour_goal(class="input input-bordered input-error w-full", value=goal.hour_goal ) }}
+                <div class="invalid-feedback text-red-500 mt-2">
                     {% for error in form.hour_goal.errors %}
                         <span>{{ error }}</span>
                     {% endfor %}
                 </div>
             {% else %}
-                {{ form.hour_goal(class="input input-bordered", value=goal.hour_goal ) }}
+                {{ form.hour_goal(class="input input-bordered w-full", value=goal.hour_goal ) }}
             {% endif %}
         </div>
-        <button type="submit" class="btn btn-primary">Update Goal</button>
+        <button type="submit" class="btn btn-primary w-full py-2 mt-4 mb-4">Update Goal</button>
     </form>
-    <form method="POST" action="{{ url_for('delete_goal', goal_id=goal.id) }}" class="inline">
+    <form method="POST" action="{{ url_for('delete_goal', goal_id=goal.id) }}" class="inline mt-4">
         {{ form.hidden_tag() }}
-        <button type="submit" class="btn btn-sm btn-error">Delete</button>
+        <button type="submit" class="btn btn-sm btn-error w-full">Delete goal</button>
     </form>
 </div>
 {% endblock %}

@@ -1,36 +1,50 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4">Add Goal</h1>
-    <form method="POST" class="space-y-4">
-        {{ form.hidden_tag() }}
-        <div class="form-control">
-            {{ form.details.label(class="label-text") }}
-            {% if form.details.errors %}
-                {{ form.details(class="input input-bordered is-invalid") }}
-                <div class="invalid-feedback">
-                    {% for error in form.details.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% else %}
-                {{ form.details(class="input input-bordered") }}
-            {% endif %}
-        </div>
-        <div class="form-control">
-            {{ form.hour_goal.label(class="label-text") }}
-            {% if form.hour_goal.errors %}
-                {{ form.hour_goal(class="input input-bordered is-invalid") }}
-                <div class="invalid-feedback">
-                    {% for error in form.hour_goal.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% else %}
-                {{ form.hour_goal(class="input input-bordered") }}
-            {% endif %}
-        </div>
-        <button type="submit" class="btn btn-primary">Add Goal</button>
-    </form>
+<div class="flex justify-center items-center bg-base-200 mt-15">
+    <div class="card w-full max-w-md bg-base-100 shadow-xl p-6 rounded-lg">
+        <form method="POST" class="w-full space-y-6">
+            {{ form.hidden_tag() }}
+            <h2 class="text-3xl font-bold text-center text-primary">Add Goal</h2>
+            
+            <div class="form-control">
+                <label for="details" class="label">
+                    <span class="label-text text-lg font-medium">{{ form.details.label.text }}</span>
+                </label>
+                {% if form.details.errors %}
+                    {{ form.details(class="input input-bordered border-error w-full") }}
+                    <div class="text-error text-sm mt-1">
+                        {% for error in form.details.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.details(class="input input-bordered w-full") }}
+                {% endif %}
+            </div>
+
+            <div class="form-control">
+                <label for="hour_goal" class="label">
+                    <span class="label-text text-lg font-medium">{{ form.hour_goal.label.text }}</span>
+                </label>
+                {% if form.hour_goal.errors %}
+                    {{ form.hour_goal(class="input input-bordered border-error w-full") }}
+                    <div class="text-error text-sm mt-1">
+                        {% for error in form.hour_goal.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.hour_goal(class="input input-bordered w-full") }}
+                {% endif %}
+            </div>
+
+            <div class="form-control mt-4">
+                <button type="submit" class="btn btn-primary w-full">
+                    Add Goal
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}
